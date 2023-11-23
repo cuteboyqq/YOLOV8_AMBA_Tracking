@@ -29,8 +29,9 @@ VisionTracker::VisionTracker(std::string configPath)
 #endif
 
   // === initialize parameters === //
+  printf("[VisionTracker(std::string configPath)] Start _init(configPath)\n");
   _init(configPath);
-
+  printf("[VisionTracker(std::string configPath)] End _init(configPath)\n");
 #if defined (SPDLOG)
   // Create a file rotating logger with 5 MB size max and 3 rotated files
   auto max_size = 1048576 * 5;
@@ -81,22 +82,31 @@ bool VisionTracker::_init(std::string configPath)
   utils::getDateTime(m_dbg_dateTime);
 
   // Read VisionTracker Configuration
+  printf("[VisionTracker::_init(std::string configPath)] start m_config = new Config_S()\n");
   m_config = new Config_S();
+  printf("[VisionTracker::_init(std::string configPath)] End m_config = new Config_S()\n");
+  printf("[VisionTracker::_init(std::string configPath)] Start m_configReader = new TrackerConfigReader()\n");
   m_configReader = new TrackerConfigReader();
+  printf("[VisionTracker::_init(std::string configPath)] End m_configReader = new TrackerConfigReader()\n");
+  printf("[VisionTracker::_init(std::string configPath)] Start m_configReader->read(configPath)\n");
   m_configReader->read(configPath);
+  printf("[VisionTracker::_init(std::string configPath)] End m_configReader->read(configPath)\n");
 #if defined (SPDLOG)
   m_logger->info("Read configuration file ... Done");
 #endif
+  printf("[VisionTracker::_init(std::string configPath)] Start m_config = m_configReader->getConfig()\n");
   m_config = m_configReader->getConfig();
-
+  printf("[VisionTracker::_init(std::string configPath)] end m_config = m_configReader->getConfig()\n");
 #if defined (SPDLOG)
   m_logger->info("Set configuration ... Done");
 #endif
-
+  printf("[VisionTracker::_init(std::string configPath)] Start if (utils::checkFileExists(m_config->modelPath))\n");
   // Create AI model
   if (utils::checkFileExists(m_config->modelPath))
-  {
+  { 
+    printf("[VisionTracker::_init(std::string configPath)] Start m_yolov8 = new YOLOv8(m_config)\n");
     m_yolov8 = new YOLOv8(m_config);
+    printf("[VisionTracker::_init(std::string configPath)] End m_yolov8 = new YOLOv8(m_config)\n");
 #if defined (SPDLOG)
     m_logger->info("Init AI model ... Done");
 #endif
@@ -109,13 +119,13 @@ bool VisionTracker::_init(std::string configPath)
 #endif
     exit(0);
   }
-
+  printf("[VisionTracker::_init(std::string configPath)] End if (utils::checkFileExists(m_config->modelPath))\n");
   // ROI
   _initROI();
 #if defined (SPDLOG)
   m_logger->info("Init ROI ... Done");
 #endif
-
+  printf("[VisionTracker::_init(std::string configPath)] Start parameter setting\n");
   // Video Input Size
   m_videoWidth = m_config->frameWidth;
   m_videoHeight = m_config->frameHeight;
@@ -133,17 +143,23 @@ bool VisionTracker::_init(std::string configPath)
   // Distance Estimation
   m_focalRescaleRatio = (float)m_videoHeight / (float)m_modelHeight;
 
-  // Object Traccker
+  // Object Tracker
+  printf("[VisionTracker::_init(std::string configPath)] Start new ObjectTracker\n");
+  printf("[VisionTracker::_init(std::string configPath)] Start new ObjectTracker human\n");
   m_humanTracker = new ObjectTracker(m_config, "human");
+   printf("[VisionTracker::_init(std::string configPath)] End new ObjectTracker human\n");
   m_bikeTracker = new ObjectTracker(m_config, "bike");
   m_vehicleTracker = new ObjectTracker(m_config, "vehicle");
   m_motorbikeTracker = new ObjectTracker(m_config, "motorbike");
-
+  printf("[VisionTracker::_init(std::string configPath)] End nee ObjectTracker\n");
   // TODO:
+  printf("[VisionTracker::_init(std::string configPath)] Start setROI\n");
   m_vehicleTracker->setROI(*m_roi);
   m_bikeTracker->setROI(*m_roi);
   m_humanTracker->setROI(*m_roi);
   m_motorbikeTracker->setROI(*m_roi);
+  printf("[VisionTracker::_init(std::string configPath)] End setROI\n");
+  printf("[VisionTracker::_init(std::string configPath)] End parameter setting\n");
 #if defined (SPDLOG)
   m_logger->info("Init Object Trackers ... Done");
 #endif

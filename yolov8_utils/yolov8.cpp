@@ -117,8 +117,9 @@ YOLOv8::YOLOv8(Config_S *config)  // main function
   // }
 
   // STEP4: Init Model Input/Output Tensor
+  printf("[YOLOv8::YOLOv8(Config_S *config)] Start   _initModelIO()\n");
   _initModelIO();
-
+  printf("[YOLOv8::YOLOv8(Config_S *config)] End   _initModelIO()\n");
   // Output Decoder
   m_decoder = new YOLOv8_Decoder(m_inputHeight, m_inputWidth);
 };

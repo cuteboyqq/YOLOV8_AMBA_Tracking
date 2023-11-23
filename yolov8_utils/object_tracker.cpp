@@ -16,6 +16,7 @@
 
 ObjectTracker::ObjectTracker(Config_S *_config, string _task)
 {
+  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start Task name \n");
   // Task name
   if (_task == "human")
   {
@@ -37,7 +38,7 @@ ObjectTracker::ObjectTracker(Config_S *_config, string _task)
     m_task = TRACK_MOTORBIKE;
     m_loggerStr = "MotorbikeTracker";
   }
-
+  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End Task name \n");
   // Logger
 #if defined (SPDLOG)
   auto m_logger = spdlog::stdout_color_mt(m_loggerStr);
@@ -59,7 +60,7 @@ ObjectTracker::ObjectTracker(Config_S *_config, string _task)
   else
     m_logger->set_level(spdlog::level::info);
 #endif
-
+  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start set parameters \n");
   // Image Size
   m_videoWidth = _config->frameWidth;
   m_videoHeight = _config->frameHeight;
@@ -88,8 +89,10 @@ ObjectTracker::ObjectTracker(Config_S *_config, string _task)
 
   // Trajectory
   m_trajectory = new Trajectory(_config);
-
+  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End set parameters \n");
+  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start _init(_config) \n");
   _init(_config);
+  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End _init(_config) \n");
 };
 
 
@@ -111,7 +114,7 @@ bool ObjectTracker::_init(Config_S *_config)
 #if defined (SPDLOG)
   auto m_logger = spdlog::get(m_loggerStr);
 #endif
-
+   printf("[bool ObjectTracker::_init(Config_S *_config)] Start Object Detection \n");
   // Object Detection
   if (m_task == TRACK_HUMAN)
   {
@@ -133,20 +136,9 @@ bool ObjectTracker::_init(Config_S *_config)
     m_tWidth = 20;                   // BoundingBox's width must > tWidth
     m_tHeight = 20;                  // BoundingBox's height must > tHeight
   }
-
-
+printf("[bool ObjectTracker::_init(Config_S *_config)] End Object Detection \n");
+printf("[bool ObjectTracker::_init(Config_S *_config)] Start Matching threshold \n");
   // Matching threshold
-  if (_config->stTrackerConifg.matchingLevel == "Low")      // Level: Low
-  {
-    // rAppearance settings
-    m_tMatchMinRequriement = 0.45;
-
-    // Matching score
-    m_tMatchSingle = 0.5;
-    m_tMatchMultiple = 0.5;
-  }
-  else if (_config->stTrackerConifg.matchingLevel == "Normal")   // Level: Normal (Default)
-  {
     // rAppearance settings
     m_tMatchMinRequriement = 0.5;
 
@@ -159,30 +151,57 @@ bool ObjectTracker::_init(Config_S *_config)
       m_tMatchSingle = 0.3;
       m_tMatchMultiple = 0.3;
     }
-  }
-  else if (_config->stTrackerConifg.matchingLevel == "High")   // Level: High
-  {
-    // rAppearance settings
-    m_tMatchMinRequriement = 0.525;
+  // if (_config->stTrackerConifg.matchingLevel == "Low")      // Level: Low
+  // {
+  //   // rAppearance settings
+  //   m_tMatchMinRequriement = 0.45;
 
-    // Matching score
-    m_tMatchSingle = 0.5;
-    m_tMatchMultiple = 0.5;
-  }
-  else
-  {
-#if defined (SPDLOG)
-    m_logger->debug("[Tracker] Matching score uses defualt confiuration ...");
-#endif
-  }
+  //   // Matching score
+  //   m_tMatchSingle = 0.5;
+  //   m_tMatchMultiple = 0.5;
+  //   printf("[bool ObjectTracker::_init(Config_S *_config)] End if (_config->stTrackerConifg.matchingLevel == Low)\n");
+  // }
+  // else if (_config->stTrackerConifg.matchingLevel == "Normal")   // Level: Normal (Default)
+  // {
+  //   // rAppearance settings
+  //   m_tMatchMinRequriement = 0.5;
 
+  //   // Matching score
+  //   m_tMatchSingle = 0.8;
+  //   m_tMatchMultiple = 0.8;
+
+  //   if (m_task != TRACK_CAR)
+  //   {
+  //     m_tMatchSingle = 0.3;
+  //     m_tMatchMultiple = 0.3;
+  //   }
+  //   printf("[bool ObjectTracker::_init(Config_S *_config)] End if (_config->stTrackerConifg.matchingLevel == Normal)\n");
+  // }
+  // else if (_config->stTrackerConifg.matchingLevel == "High")   // Level: High
+  // {
+  //   // rAppearance settings
+  //   m_tMatchMinRequriement = 0.525;
+
+  //   // Matching score
+  //   m_tMatchSingle = 0.5;
+  //   m_tMatchMultiple = 0.5;
+  //   printf("[bool ObjectTracker::_init(Config_S *_config)] End if (_config->stTrackerConifg.matchingLevel == High)\n");
+  // }
+//   else
+//   {
+// #if defined (SPDLOG)
+//     m_logger->debug("[Tracker] Matching score uses defualt confiuration ...");
+// #endif
+//   }
+printf("[bool ObjectTracker::_init(Config_S *_config)] End Matching threshold \n");
   // Alive counter threshold
   m_tAliveCounter = 10;
 
   if (m_task != TRACK_CAR)
     m_tAliveCounter *= 0.3;
-
+printf("[bool ObjectTracker::_init(Config_S *_config)] Start  _initObjectList()\n");
   _initObjectList();
+  printf("[bool ObjectTracker::_init(Config_S *_config)] End  _initObjectList()\n");
 }
 
 

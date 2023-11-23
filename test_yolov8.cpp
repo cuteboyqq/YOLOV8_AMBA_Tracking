@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 		cv::Mat img;
 		cout<<"Start yolov8.Get_img"<<endl;
 		img = yolov8.Get_img();
-		cout<<"End olov8.Get_img"<<endl;
+		cout<<"End yolov8.Get_img"<<endl;
 		sig_flag = yolov8.test_yolov8_run(); //RVAL_OK
 		// cout<<"Start yolov8.yolov8_thread_join()"<<endl;
 		// yolov8.yolov8_thread_join();
@@ -44,9 +44,10 @@ int main(int argc, char **argv)
 		printf("c = %d\n",c);
 		cout<<"Start yolov8.Draw_Yolov8_Bounding_Boxes"<<endl;
 
+		yolov8.Draw_Yolov8_Bounding_Boxes(bboxList,c,img);
 		track.run(img,bboxList);
 
-		yolov8.Draw_Yolov8_Bounding_Boxes(bboxList,c,img);
+		
 		
 		
 		c+=1;
