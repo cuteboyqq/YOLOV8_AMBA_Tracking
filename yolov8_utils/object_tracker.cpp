@@ -15,8 +15,8 @@
 
 
 ObjectTracker::ObjectTracker(Config_S *_config, string _task)
-{
-  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start Task name \n");
+{ printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start ~~~~~~~~~~~~~ \n");
+  //printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start Task name \n");
   // Task name
   if (_task == "human")
   {
@@ -38,7 +38,7 @@ ObjectTracker::ObjectTracker(Config_S *_config, string _task)
     m_task = TRACK_MOTORBIKE;
     m_loggerStr = "MotorbikeTracker";
   }
-  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End Task name \n");
+  //printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End Task name \n");
   // Logger
 #if defined (SPDLOG)
   auto m_logger = spdlog::stdout_color_mt(m_loggerStr);
@@ -60,7 +60,7 @@ ObjectTracker::ObjectTracker(Config_S *_config, string _task)
   else
     m_logger->set_level(spdlog::level::info);
 #endif
-  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start set parameters \n");
+  //printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start set parameters \n");
   // Image Size
   m_videoWidth = _config->frameWidth;
   m_videoHeight = _config->frameHeight;
@@ -89,10 +89,11 @@ ObjectTracker::ObjectTracker(Config_S *_config, string _task)
 
   // Trajectory
   m_trajectory = new Trajectory(_config);
-  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End set parameters \n");
-  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start _init(_config) \n");
+  //printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End set parameters \n");
+  //printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start _init(_config) \n");
   _init(_config);
-  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End _init(_config) \n");
+  //printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End _init(_config) \n");
+  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End ~~~~~~~~~~~~~ \n");
 };
 
 
@@ -111,9 +112,9 @@ ObjectTracker::~ObjectTracker()
 // ============================================
 bool ObjectTracker::_init(Config_S *_config)
 {
-#if defined (SPDLOG)
-  auto m_logger = spdlog::get(m_loggerStr);
-#endif
+// #if defined (SPDLOG)
+//   auto m_logger = spdlog::get(m_loggerStr);
+// #endif
    printf("[bool ObjectTracker::_init(Config_S *_config)] Start Object Detection \n");
   // Object Detection
   if (m_task == TRACK_HUMAN)
@@ -136,8 +137,8 @@ bool ObjectTracker::_init(Config_S *_config)
     m_tWidth = 20;                   // BoundingBox's width must > tWidth
     m_tHeight = 20;                  // BoundingBox's height must > tHeight
   }
-printf("[bool ObjectTracker::_init(Config_S *_config)] End Object Detection \n");
-printf("[bool ObjectTracker::_init(Config_S *_config)] Start Matching threshold \n");
+//printf("[bool ObjectTracker::_init(Config_S *_config)] End Object Detection \n");
+//printf("[bool ObjectTracker::_init(Config_S *_config)] Start Matching threshold \n");
   // Matching threshold
     // rAppearance settings
     m_tMatchMinRequriement = 0.5;
@@ -193,20 +194,29 @@ printf("[bool ObjectTracker::_init(Config_S *_config)] Start Matching threshold 
 //     m_logger->debug("[Tracker] Matching score uses defualt confiuration ...");
 // #endif
 //   }
-printf("[bool ObjectTracker::_init(Config_S *_config)] End Matching threshold \n");
+//printf("[bool ObjectTracker::_init(Config_S *_config)] End Matching threshold \n");
+
+ 
+
   // Alive counter threshold
   m_tAliveCounter = 10;
 
   if (m_task != TRACK_CAR)
-    m_tAliveCounter *= 0.3;
-printf("[bool ObjectTracker::_init(Config_S *_config)] Start  _initObjectList()\n");
+  {
+     m_tAliveCounter *= 0.3;
+  }
+   //printf("[bool ObjectTracker::_init(Config_S *_config)] Start  _initObjectList()\n");
+//printf("2023-11-24~~~~~~~~~~\n");
   _initObjectList();
-  printf("[bool ObjectTracker::_init(Config_S *_config)] End  _initObjectList()\n");
+  printf("[bool ObjectTracker::_init(Config_S *_config)]] End Object Detection \n");
+  //printf("[bool ObjectTracker::_init(Config_S *_config)] End  _initObjectList()\n");
+  return true;
 }
 
 
 bool ObjectTracker::_initObjectList()
 {
+  //printf("[bool ObjectTracker::_initObjectList()] Start ----------------------\n");
   // Initialize Object List
   for (int i=0; i<m_maxObject; i++)
   {
@@ -220,8 +230,8 @@ bool ObjectTracker::_initObjectList()
     Object tmpObj;
     m_prevObjList.push_back(tmpObj);
   }
-
-  return true;
+  //printf("[bool ObjectTracker::_initObjectList()] End ----------------------\n");
+  return true;  
 }
 
 
@@ -270,19 +280,20 @@ void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)
     m_logger->info("-----------------------------------------");
   }
 #endif
-
+  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] Start  _setCurrBoundingBox(bboxList); \n");
   _setCurrBoundingBox(bboxList);
-
+  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _setCurrBoundingBox(bboxList); \n");
+  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] Start  _updateFrameStamp(); \n");
   _updateFrameStamp();
-
+  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _updateFrameStamp(); \n");
   _setCurrFrame(img);
-
+  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _setCurrFrame(); \n");
   _updateCurrObjectList();
-
+  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _updateCurrObjectList(); \n");
   _updateTrackingObject();
-
+  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _updateTrackingObject(); \n");
   _filterOverlapObject();
-
+  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _filterOverlapObject(); \n");
 #if defined (SPDLOG)
   if (m_estimateTime)
   {
@@ -2245,7 +2256,7 @@ int ObjectTracker::_updateFrameStamp()
   {
     m_frameStamp = 0;
   }
-
+  return 1;
 }
 
 

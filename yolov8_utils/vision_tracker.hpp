@@ -142,7 +142,7 @@ class VisionTracker
   // === Display === //
   cv::Mat m_dsp_img;
   cv::Mat m_dsp_imgResize;
-  bool m_dsp_results = false;
+  bool m_dsp_results = true;
   bool m_dsp_objectDetection = false;
   bool m_dsp_objectTracking = false;
   bool m_dsp_warningZone = false;
@@ -155,7 +155,7 @@ class VisionTracker
   bool m_dbg_objectDetection = false;
   bool m_dbg_objectTracking = false;
   bool m_dbg_saveLogs = false;
-  bool m_dbg_saveImages = false;
+  bool m_dbg_saveImages = true;
   bool m_dbg_saveRawImages = false;
   std::string m_dbg_logsDirPath = "";
   std::string m_dbg_imgsDirPath = "";

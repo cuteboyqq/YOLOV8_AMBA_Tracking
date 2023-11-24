@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 	std::vector<BoundingBox> bboxList;
 	YoloV8_Class yolov8(argc,argv);
 	std::string configPath = "./config/config.txt";
-	VisionTracker track(configPath);
+	VisionTracker _track(configPath);
 	int c = 0;
 	ea_tensor_t *tensor;
 	img_set_t *img_set;
@@ -45,8 +45,12 @@ int main(int argc, char **argv)
 		cout<<"Start yolov8.Draw_Yolov8_Bounding_Boxes"<<endl;
 
 		yolov8.Draw_Yolov8_Bounding_Boxes(bboxList,c,img);
-		track.run(img,bboxList);
-
+		printf("[int main(int argc, char **argv)] Start _track.run(img,bboxList); \n");
+		//if(bboxList.size()>0){
+		_track.run(img,bboxList);
+		//}
+	
+		printf("[int main(int argc, char **argv)] End _track.run(img,bboxList); \n");
 		
 		
 		
