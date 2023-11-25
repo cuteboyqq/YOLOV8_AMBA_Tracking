@@ -558,17 +558,17 @@ int ObjectTracker::_updateCurrObjectList() //TODO: refactor?
           m_bboxList[i], rescaleBBox, m_modelWidth, m_modelHeight, m_videoWidth, m_videoHeight);
         cout<<"[TRACK_HUMAN]End rescaleBBox"<<endl;
         cout<<"------------------------------------------------------------"<<endl;
-        cv::Mat imgCrop;
-        cout<<"[TRACK_HUMAN]Start cropImages"<<endl;
-        imgUtil::cropImages(m_img, imgCrop, rescaleBBox);
-        cout<<"[TRACK_HUMAN]End cropImages"<<endl;
+        // cv::Mat imgCrop;
+        // cout<<"[TRACK_HUMAN]Start cropImages"<<endl;
+        // imgUtil::cropImages(m_img, imgCrop, rescaleBBox);
+        // cout<<"[TRACK_HUMAN]End cropImages"<<endl;
         // Get Keypoints and Descriptors
-        cv::Mat imgGray;
-        vector<cv::KeyPoint> kpt;
-        cv::cvtColor(imgCrop, imgGray, cv::COLOR_BGR2GRAY);
-        // cv::cvtColor(m_img, imgGray, cv::COLOR_BGR2GRAY);
-        _calcKeypoint(imgGray, kpt);
-        ptrObj->updateKeypoint(kpt);
+        // cv::Mat imgGray;
+        // vector<cv::KeyPoint> kpt;
+        // cv::cvtColor(imgCrop, imgGray, cv::COLOR_BGR2GRAY);
+        // // cv::cvtColor(m_img, imgGray, cv::COLOR_BGR2GRAY);
+        // _calcKeypoint(imgGray, kpt);
+        // ptrObj->updateKeypoint(kpt);
 
         // // Trajectory
         // vector<Point> tmpTrajectoryList;

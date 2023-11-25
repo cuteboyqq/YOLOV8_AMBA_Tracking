@@ -1,0 +1,78 @@
+# Project: WNC Vision Tracking Application
+
+
+# === Model Information === #
+#1040
+#640
+ModelPath = model/onnx_yolov8n_det_cavalry.bin
+ModelWidth = 416
+ModelHeight = 416
+
+
+# === Camera Information === #
+
+CameraHeight = 1.25
+CameraFocalLength = 750.0
+FrameWidth = 1920
+FrameHeight = 1080
+FrameSquare = 0
+
+
+# === Processing Time === #
+
+ProcessingFrameStep = 4
+ProcessingFrameRate = 15.0
+
+
+# === Object Detection === #
+
+MaxDetection = 10		    # How many people can be detected at most
+DetectionRange = Far		# How far can people be detected  ( Near / Medium / Far )
+RemoveOverlap = 1		    # 1: Remove overlapped bounding box (default) / 0: Keep overlapped bounding box
+HumanConfidence = 0.25		# Confidence threshold for human
+BikeConfidence = 0.25		# Confidence threshold for bike
+CarConfidence = 0.25		    # Confidence threshold for car
+MotorbikeConfidence = 0.25	# Confidence threshold for motorbike
+
+
+# === Object Tracking === #
+
+MaxTracking = 10			    # How many object can be tracked at most
+MatchingLevel = Normal		# How similar of two objects 	  ( Low / Normal / High )
+
+
+# === Debug === #
+
+DebugConfig = 1
+DebugTracking = 0
+DebugYolov8 = 0
+DebugObjectDetection = 1
+DebugObjectTracking = 0
+DebugHumanTracker = 1
+DebugBikeTracker = 0
+DebugVehicleTracker = 0
+DebugMotorbikeTracker = 0
+DebugSaveLogs = 0
+DebugSaveImages = 0
+DebugSaveRawImages = 0
+DebugLogsDirPath = debug/logs
+DebugImagesDirPath = debug/images
+DebugRawImagesDirPath = debug/raw_images
+
+
+# === Display === #
+
+DisplayResults = 1
+DisplayObjectDetection = 1
+DisplayObjectTracking = 1
+DisplayWarningZone = 0
+DisplayInformation = 1
+DisplayMaxFrameIndex = 1000
+
+
+# === Show Processing Time === #
+
+ShowProcTimeTracking = 0
+ShowProcTimeYOLOv8 = 0
+ShowProcTimeObjectTracking = 0
+

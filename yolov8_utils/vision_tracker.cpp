@@ -1139,7 +1139,7 @@ void VisionTracker::_drawResults()
 {
   int waitKey = 1;
     printf("[void VisionTracker::_drawResults()] Start resize m_dsp_img\n");
-  cv::resize(m_dsp_img, m_dsp_imgResize, cv::Size(1024, 640), cv::INTER_LINEAR);
+  cv::resize(m_dsp_img, m_dsp_imgResize, cv::Size(1024, 640), cv::INTER_LINEAR); //1024,640
   printf("[void VisionTracker::_drawResults()] End resize m_dsp_img\n");
 
   printf("[void VisionTracker::_drawResults()] Start _drawBoundingBoxes()\n");
