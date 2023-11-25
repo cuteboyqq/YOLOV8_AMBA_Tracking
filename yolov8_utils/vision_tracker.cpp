@@ -1004,6 +1004,7 @@ void VisionTracker::_drawBoundingBoxes()
 
 void VisionTracker::_drawTrackedObjects()
 {
+  cout<< "    m_trackedObjList.size() = "<<m_trackedObjList.size()<<endl;
   for (int i = 0; i < m_trackedObjList.size(); i++)
   {
     const Object& trackedObj = m_trackedObjList[i];
@@ -1011,6 +1012,11 @@ void VisionTracker::_drawTrackedObjects()
     // Skip objects with specific conditions
     if (trackedObj.status == 0 || trackedObj.disappearCounter > 5 || trackedObj.bboxList.empty())
     {
+      cout<<"   Skip objects with specific conditions"<<endl;
+      cout<<"trackedObj.status == 0 || trackedObj.disappearCounter > 5 || trackedObj.bboxList.empty()"<<endl;
+      cout<<" trackedObj.status = "<<trackedObj.status<<endl;
+      cout<<"trackedObj.disappearCounter = "<<trackedObj.disappearCounter<<endl;
+      cout<<"trackedObj.bboxList = "<<trackedObj.bboxList.size()<<endl;
       continue;
     }
 
@@ -1028,18 +1034,24 @@ void VisionTracker::_drawTrackedObjects()
     BoundingBox rescaleBox(-1, -1, -1, -1, -1);
 
     // Rescale BBoxes
-    utils::rescaleBBox(
-      lastBox, rescaleBox,
-      m_config->modelWidth, m_config->modelHeight,
-      m_config->frameWidth, m_config->frameHeight);
+    // utils::rescaleBBox(
+    //   lastBox, rescaleBox,
+    //   m_config->modelWidth, m_config->modelHeight,
+    //   m_config->frameWidth, m_config->frameHeight);
 
     if (trackedObj.aliveCounter < 3)
     {
       // Draw bounding box in green
-      imgUtil::roundedRectangle(
-        m_dsp_img, cv::Point(rescaleBox.x1, rescaleBox.y1),
-        cv::Point(rescaleBox.x2, rescaleBox.y2),
+      // imgUtil::roundedRectangle(
+      //   m_dsp_imgResize, cv::Point(rescaleBox.x1, rescaleBox.y1), //m_dsp_imgResize //m_dsp_img
+      //   cv::Point(rescaleBox.x2, rescaleBox.y2),
+      //   cv::Scalar(0, 250, 0), 2, 0, 10, false);
+       imgUtil::roundedRectangle(
+        m_dsp_imgResize, cv::Point(lastBox.x1, lastBox.y1), //m_dsp_imgResize //m_dsp_img
+        cv::Point(lastBox.x2, lastBox.y2),
         cv::Scalar(0, 250, 0), 2, 0, 10, false);
+
+
     }
     else
     {
@@ -1055,9 +1067,13 @@ void VisionTracker::_drawTrackedObjects()
         color = cv::Scalar(110, 255, 120);
 
       // Draw bounding box with the determined color
-      imgUtil::roundedRectangle(
-        m_dsp_img, cv::Point(rescaleBox.x1, rescaleBox.y1),
-        cv::Point(rescaleBox.x2, rescaleBox.y2),
+      // imgUtil::roundedRectangle(
+      //   m_dsp_imgResize, cv::Point(rescaleBox.x1, rescaleBox.y1), //m_dsp_img
+      //   cv::Point(rescaleBox.x2, rescaleBox.y2),
+      //   color, 2, 0, 10, false);
+       imgUtil::roundedRectangle(
+        m_dsp_imgResize, cv::Point(lastBox.x1, lastBox.y1), //m_dsp_img
+        cv::Point(lastBox.x2, lastBox.y2),
         color, 2, 0, 10, false);
     }
 
@@ -1080,20 +1096,32 @@ void VisionTracker::_drawTrackedObjects()
       clsLabel = "M ";
     }
 
+    // cv::rectangle(
+    //   m_dsp_imgResize,
+    //   cv::Point(rescaleBox.x1 + 10, rescaleBox.y1 - 75), //m_dsp_img
+    //   cv::Point(rescaleBox.x1 + 160, rescaleBox.y1 - 3),
+    //   (0, 0, 0),
+    //   -1/*fill*/);
     cv::rectangle(
-      m_dsp_img,
-      cv::Point(rescaleBox.x1 + 10, rescaleBox.y1 - 75),
-      cv::Point(rescaleBox.x1 + 160, rescaleBox.y1 - 3),
+      m_dsp_imgResize,
+      cv::Point(lastBox.x1 + 10, lastBox.y1 - 75), //m_dsp_img
+      cv::Point(lastBox.x1 + 160, lastBox.y1 - 3),
       (0, 0, 0),
       -1/*fill*/);
 
 
     Point pCenter = lastBox.getCenterPoint();
-
-    cv::putText(m_dsp_img, clsLabel + std::to_string(trackedObj.id) + " " + std::to_string(pCenter.x) + ", " + std::to_string(pCenter.y),
-      cv::Point(int(rescaleBox.x1) + 20, int(rescaleBox.y1) - 15),
-      cv::FONT_HERSHEY_DUPLEX, 2.0,
+    //m_dsp_img
+    // cv::putText(m_dsp_imgResize, clsLabel + std::to_string(trackedObj.id) + " " + std::to_string(pCenter.x) + ", " + std::to_string(pCenter.y),
+    //   cv::Point(int(rescaleBox.x1) + 20, int(rescaleBox.y1) - 15),
+    //   cv::FONT_HERSHEY_DUPLEX, 2.0,
+    //   cv::Scalar(255, 255, 255), 2, 5, 0);
+    cout<<"Start Tracker putText ID~~~~"<<endl;
+     cv::putText(m_dsp_imgResize, clsLabel + std::to_string(trackedObj.id) + " " + std::to_string(pCenter.x) + ", " + std::to_string(pCenter.y),
+      cv::Point(int(lastBox.x1) + 20, int(lastBox.y1) - 15),
+      cv::FONT_HERSHEY_COMPLEX_SMALL, 2.0,
       cv::Scalar(255, 255, 255), 2, 5, 0);
+    cout<<"End Tracker putText ID~~~~"<<endl;
   }
 }
 
@@ -1150,10 +1178,10 @@ void VisionTracker::_drawResults()
   printf("[void VisionTracker::_drawResults()] End _drawBoundingBoxes()\n");
 
   printf("[void VisionTracker::_drawResults()] Start _drawTrackedObjects()\n");
-  if (m_dsp_objectTracking)
-  {
+  // if (m_dsp_objectTracking)
+  // {
     _drawTrackedObjects();
-  }
+  //}
   printf("[void VisionTracker::_drawResults()] End _drawTrackedObjects()\n");
 
   // printf("[void VisionTracker::_drawResults()] Start resize m_dsp_img\n");
