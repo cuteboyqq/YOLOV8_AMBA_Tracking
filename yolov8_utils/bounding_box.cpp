@@ -17,7 +17,7 @@
 /////////////////////////
 // public member functions
 ////////////////////////
-BoundingBox::BoundingBox(float _x1, float _y1, float _x2, float _y2, int _label)
+BoundingBox::BoundingBox(int _x1, int _y1, int _x2, int _y2, int _label)
 {
   // === initialize parameters === //
   x1 = _x1;
@@ -32,7 +32,21 @@ BoundingBox::BoundingBox(float _x1, float _y1, float _x2, float _y2, int _label)
       BBOX[" << x1 << ", " << y1 << ", " << x2 << ", " << y2 << "]" << endl;
   }
 };
+// BoundingBox::BoundingBox(float _x1, float _y1, float _x2, float _y2, int _label)
+// {
+//   // === initialize parameters === //
+//   x1 = _x1;
+//   y1 = _y1;
+//   x2 = _x2;
+//   y2 = _y2;
+//   label = _label;
 
+//   if (debugMode)
+//   {
+//     std::cout << "[INFO] Create a \
+//       BBOX[" << x1 << ", " << y1 << ", " << x2 << ", " << y2 << "]" << endl;
+//   }
+// };
 
 BoundingBox::~BoundingBox()
 {};

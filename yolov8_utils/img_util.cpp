@@ -625,7 +625,10 @@ namespace imgUtil
 
     w = box.x2 - box.x1;
     h = box.y2 - box.y1;
-
+    cout<<"[cropImages]box.x1 = "<<box.x1<<endl;
+    cout<<"[cropImages]box.y1 = "<<box.y1<<endl;
+    cout<<"[cropImages]w = "<<w<<endl;
+    cout<<"[cropImages]h = "<<h<<endl;
     cv::Rect roi(box.x1, box.y1, w, h);
     imgCrop = img(roi);
   }

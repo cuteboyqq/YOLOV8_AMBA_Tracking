@@ -693,7 +693,7 @@ std::vector<BoundingBox> YoloV8_Class::Get_yolov8_Bounding_Boxes(live_ctx_t *liv
 }
 
 
-int YoloV8_Class::Get_Yolov8_Bounding_Boxes(std::vector<BoundingBox> &bboxList)
+int YoloV8_Class::Get_Yolov8_Bounding_Boxes(std::vector<BoundingBox> &bboxList,cv::Mat img)
 {
 	//Object obj;
 	printf("[Get_Yolov8_Bounding_Boxes]start initial yolov8_result~~~\n");
@@ -730,10 +730,22 @@ int YoloV8_Class::Get_Yolov8_Bounding_Boxes(std::vector<BoundingBox> &bboxList)
 			yolov8_result->bbox[i].score,
 			yolov8_result->bbox[i].label);
 
-			bboxList.push_back(BoundingBox(yolov8_result->bbox[i].x_start,
-									yolov8_result->bbox[i].y_start,
-									yolov8_result->bbox[i].x_end,
-									yolov8_result->bbox[i].y_end,
+			cout<<"[Get_Yolov8_Bounding_Boxes]img.rows = "<<img.rows<<endl;
+			cout<<"[Get_Yolov8_Bounding_Boxes]img.cols = "<<img.cols<<endl;
+			int x1 = int(yolov8_result->bbox[i].x_start * 1040);
+			int y1 = int(yolov8_result->bbox[i].y_start * 640);
+			int x2 = int(yolov8_result->bbox[i].x_end * 1040);
+			int y2 = int(yolov8_result->bbox[i].y_end * 640);
+			// int x1 = int(yolov8_result->bbox[i].x_start * img.cols);
+			// int y1 = int(yolov8_result->bbox[i].y_start * img.rows);
+			// int x2 = int(yolov8_result->bbox[i].x_end * img.cols);
+			// int y2 = int(yolov8_result->bbox[i].y_end * img.rows);
+			// float x1 = float(yolov8_result->bbox[i].x_start);
+			// float y1 = float(yolov8_result->bbox[i].y_start);
+			// float x2 = float(yolov8_result->bbox[i].x_end);
+			// float y2 = float(yolov8_result->bbox[i].y_end);
+			// cout<<"[Get_Yolov8_Bounding_Boxes] x1:"<<x1<<" y1:"<<y1<<" x2:"<<x2<<" y2:"<<y2<<endl;
+			bboxList.push_back(BoundingBox( x1,y1,x2,y2,
 									yolov8_result->bbox[i].id));
 
 		}
@@ -741,11 +753,16 @@ int YoloV8_Class::Get_Yolov8_Bounding_Boxes(std::vector<BoundingBox> &bboxList)
 		printf("[Get_Yolov8_Bounding_Boxes]Show bboxList ~~~~~~\n");
 		for (int i=0;i<bboxList.size();i++)
 			{	
-				printf("%f, %f, %f, %f, %d\n",bboxList[i].x1,
+				printf("%d, %d, %d, %d, %d\n",bboxList[i].x1,
 											bboxList[i].y1,
 											bboxList[i].x2,
 											bboxList[i].y2,
 											bboxList[i].label);
+				// printf("%f, %f, %f, %f, %d\n",bboxList[i].x1,
+				// 							bboxList[i].y1,
+				// 							bboxList[i].x2,
+				// 							bboxList[i].y2,
+				// 							bboxList[i].label);
 			}
 	}
 		return true;
@@ -898,10 +915,14 @@ void YoloV8_Class::Draw_Yolov8_Bounding_Boxes(std::vector<BoundingBox> &bboxList
 			printf("[Draw_Yolov8_Bounding_Boxes] End initial img\n");
 			for (int i=0;i<int(bboxList.size());i++)
 			{
-				int bbox_start_x = bboxList[i].x1 * dis_win_w;
-				int bbox_start_y = bboxList[i].y1 * dis_win_h;
-				int bbox_end_x = bboxList[i].x2 * dis_win_w;
-				int bbox_end_y = bboxList[i].y2 * dis_win_h;
+				// int bbox_start_x = bboxList[i].x1 * dis_win_w;
+				// int bbox_start_y = bboxList[i].y1 * dis_win_h;
+				// int bbox_end_x = bboxList[i].x2 * dis_win_w;
+				// int bbox_end_y = bboxList[i].y2 * dis_win_h;
+				int bbox_start_x = bboxList[i].x1 * 1;
+				int bbox_start_y = bboxList[i].y1 * 1;
+				int bbox_end_x = bboxList[i].x2 * 1;
+				int bbox_end_y = bboxList[i].y2 * 1;
 				//cv::rectangle()
 				cv::Point pt1(bbox_start_x, bbox_start_y);
 				cv::Point pt2(bbox_end_x, bbox_end_y );

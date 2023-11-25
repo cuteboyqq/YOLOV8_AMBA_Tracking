@@ -515,12 +515,12 @@ bool YOLOv8::postProcessing(vector<BoundingBox> bboxlist)
 
 //     // m_logger->debug("Starting object detection post-processing......");
 
-//     m_numBox = m_decoder->decode((float *)m_detectionBoxBuff, 
-//                                   (float *)m_detectionConfBuff, 
-//                                   (float *)m_detectionClsBuff, 
-//                                   confidenceThreshold, 
-//                                   iouThreshold, 
-//                                   m_yoloOut);
+    // m_numBox = m_decoder->decode((float *)m_detectionBoxBuff, 
+    //                               (float *)m_detectionConfBuff, 
+    //                               (float *)m_detectionClsBuff, 
+    //                               confidenceThreshold, 
+    //                               iouThreshold, 
+    //                               m_yoloOut);
 
 //     // m_logger->debug("[Post-Proc]: \t{}", \
 //     //   std::chrono::duration_cast<std::chrono::nanoseconds>(time_1 - time_0).count() / (1000.0 * 1000));
@@ -556,6 +556,7 @@ void YOLOv8::_OD_postProcessing(vector<BoundingBox> bboxlist)
     bb.c_prob  = 1.0;
     m_yoloOut.push_back(bb);
   }
+  m_numBox = m_yoloOut.size();
   // m_logger->debug("=> GET # of raw BBOX(es): {}", m_numBox);
 
   for(int i=0; i< m_numBox; i++)
@@ -987,7 +988,7 @@ bool YOLOv8::getHumanBoundingBox(
 
   // Clear previous bounding boxes
   _outBboxList.clear();
-
+  cout<<"[getHumanBoundingBox]m_yoloOut.size()="<<m_yoloOut.size()<<endl;
   // m_logger->debug("Get human box => m_numBox = {}", m_numBox);
 
   // Point pROI_TL = fcwROI.getCornerPoint()[0];
@@ -995,17 +996,22 @@ bool YOLOv8::getHumanBoundingBox(
 
   float wRatio = (float)m_inputWidth / (float)videoWidth;
   float hRatio = (float)m_inputHeight / (float)videoHeight;
-
-  for(int i=0; i<m_numBox; i++)
+  cout<<"     [getHumanBoundingBox]m_numBox="<<m_numBox<<endl;
+  // for(int i=0; i<m_numBox; i++)
+  // for(int i=0; i<m_yoloOut.size(); i++)
+  for(int i=0; i<m_yoloOut.size(); i++)
   {
     v8xyxy box = m_yoloOut[i];
-    if ((box.c == HUMAN) && (box.c_prob >= confidence))
-    {
+    // if ((box.c == HUMAN) && (box.c_prob >= confidence))
+    // {
       // m_logger->debug("Get human box [{}] : ({}, {}, {}, {}, {}, {})", \
       //   i, box.x1, box.y1, box.x2, box.y2, box.c, box.c_prob);
-
+      cout<<"box.x1:"<<box.x1<<endl;
+      cout<<"box.y1:"<<box.y1<<endl;
+      cout<<"box.x2:"<<box.x2<<endl;
+      cout<<"box.y2:"<<box.y2<<endl;
+      cout<<"box.c:"<<box.c<<endl;
       BoundingBox bbox(box.x1, box.y1, box.x2, box.y2, box.c);
-
       // filter out vehicles that out of ROI
       // Point cp = bbox.getCenterPoint();
       // if (cp.x/wRatio < pROI_TL.x || cp.x/wRatio > pROI_TR.x)
@@ -1018,8 +1024,11 @@ bool YOLOv8::getHumanBoundingBox(
       // Aspect Ratio TODO:
 
       bbox.confidence = box.c_prob;
+     
+      cout<<"box.c_prob:"<<box.c_prob<<endl;
       _outBboxList.push_back(bbox);
-    }
+      cout<<"_outBboxList.size()="<<_outBboxList.size()<<endl;
+    // }
   }
   return true;
 }

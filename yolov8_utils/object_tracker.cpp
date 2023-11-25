@@ -280,20 +280,36 @@ void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)
     m_logger->info("-----------------------------------------");
   }
 #endif
+cout<<"bboxList.size()="<<bboxList.size()<<endl;
   printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] Start  _setCurrBoundingBox(bboxList); \n");
   _setCurrBoundingBox(bboxList);
+  cout<<"bboxList.size()="<<bboxList.size()<<endl;
   printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _setCurrBoundingBox(bboxList); \n");
   printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] Start  _updateFrameStamp(); \n");
   _updateFrameStamp();
+  cout<<"bboxList.size()="<<bboxList.size()<<endl;
   printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _updateFrameStamp(); \n");
   _setCurrFrame(img);
+  cout<<"bboxList.size()="<<bboxList.size()<<endl;
   printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _setCurrFrame(); \n");
+  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] Start  _updateCurrObjectList(); \n");
   _updateCurrObjectList();
+  cout<<"bboxList.size()="<<bboxList.size()<<endl;
   printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _updateCurrObjectList(); \n");
+
+
+  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] Start  _updateTrackingObject(); \n");
   _updateTrackingObject();
+  cout<<"bboxList.size()="<<bboxList.size()<<endl;
   printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _updateTrackingObject(); \n");
+
+  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] Start  _filterOverlapObject(); \n");
   _filterOverlapObject();
+  cout<<"bboxList.size()="<<bboxList.size()<<endl;
   printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _filterOverlapObject(); \n");
+
+
+  
 #if defined (SPDLOG)
   if (m_estimateTime)
   {
@@ -312,6 +328,9 @@ void ObjectTracker::_updateTrackingObject()
   // Max Tracking
   int numCurrObj = 0;
   int numPrevObj = 0;
+  cout<<"   [_updateTrackingObject] m_maxTracking = "<<m_maxTracking<<endl;
+  cout<<"   [_updateTrackingObject] m_currObjList.size() = "<<m_currObjList.size()<<endl;
+  cout<<"   [_updateTrackingObject] m_prevObjList.size() = "<<m_prevObjList.size()<<endl;
   for (int i=0; i < m_maxTracking; i++)
   {
     // Get number of enabled current object
@@ -368,16 +387,16 @@ void ObjectTracker::_updateTrackingObject()
     // cout << m_loggerStr << endl;
     // m_trajectory->bboxToTrajectory(m_prevObjList);
 
-    for (int i=0; i<m_prevObjList.size(); i++)
-    {
-      Object& obj = m_prevObjList[i];
-      if (obj.status == 0)
-        continue;
+    // for (int i=0; i<m_prevObjList.size(); i++)
+    // {
+    //   Object& obj = m_prevObjList[i];
+    //   if (obj.status == 0)
+    //     continue;
 
-      m_trajectory->updateLocation3D(obj);
+    //   m_trajectory->updateLocation3D(obj);
 
-      // cout << "Obj[" << obj.id << "] Loc = (" << obj.pLocation3D.x << " m, " << obj.pLocation3D.y << " m, " << obj.pLocation3D.z << " m)" << endl;
-    }
+    //   // cout << "Obj[" << obj.id << "] Loc = (" << obj.pLocation3D.x << " m, " << obj.pLocation3D.y << " m, " << obj.pLocation3D.z << " m)" << endl;
+    // }
   }
 }
 
@@ -443,14 +462,15 @@ int ObjectTracker::_updateCurrObjectList() //TODO: refactor?
   auto time_1 = std::chrono::high_resolution_clock::now();
 
   int ret = 1;
-
+  cout<<"[ObjectTracker::_updateCurrObjectList()] Start Initialize"<<endl;
   // Initialize
   for (int i=0; i<m_maxObject; i++)
   {
     m_currObjList[i].init(m_frameStamp);
   }
-
+  cout<<"[ObjectTracker::_updateCurrObjectList()] End Initialize"<<endl;
   int objIdx = 0;
+  cout<<"m_bboxList.size():"<<m_bboxList.size()<<endl;
   for (int i=0; i<(int)m_bboxList.size(); i++)
   {
     BoundingBox bbox = m_bboxList[i];
@@ -472,12 +492,14 @@ int ObjectTracker::_updateCurrObjectList() //TODO: refactor?
 
         // Appearance Features
         BoundingBox rescaleBBox(-1, -1, -1, -1, m_bboxList[i].label);
+        cout<<"[int ObjectTracker::_updateCurrObjectList()] Start utils::rescaleBBox"<<endl;
         utils::rescaleBBox(
           m_bboxList[i], rescaleBBox, m_modelWidth, m_modelHeight, m_videoWidth, m_videoHeight);
-
+        cout<<"[int ObjectTracker::_updateCurrObjectList()] End utils::rescaleBBox"<<endl;
         cv::Mat imgCrop;
+        cout<<"[int ObjectTracker::_updateCurrObjectList()] Start imgUtil::cropImages(m_img, imgCrop, rescaleBBox)"<<endl;
         imgUtil::cropImages(m_img, imgCrop, rescaleBBox);
-
+        cout<<"[int ObjectTracker::_updateCurrObjectList()] End imgUtil::cropImages(m_img, imgCrop, rescaleBBox)"<<endl;
         // Get Keypoints and Descriptors
         cv::Mat imgGray;
         vector<cv::KeyPoint> kpt;
@@ -525,17 +547,26 @@ int ObjectTracker::_updateCurrObjectList() //TODO: refactor?
         objIdx += 1;
 
         // Appearance Features
+        cout<<"[TRACK_HUMAN]Start rescaleBBox"<<endl;
         BoundingBox rescaleBBox(-1, -1, -1, -1, m_bboxList[i].label);
+        cout<<"m_modelWidth="<<m_modelWidth<<endl;
+        cout<<"m_modelHeight="<<m_modelHeight<<endl;
+
+        cout<<"m_videoWidth="<<m_videoWidth<<endl;
+        cout<<"m_videoHeight="<<m_videoHeight<<endl;
         utils::rescaleBBox(
           m_bboxList[i], rescaleBBox, m_modelWidth, m_modelHeight, m_videoWidth, m_videoHeight);
-
+        cout<<"[TRACK_HUMAN]End rescaleBBox"<<endl;
+        cout<<"------------------------------------------------------------"<<endl;
         cv::Mat imgCrop;
+        cout<<"[TRACK_HUMAN]Start cropImages"<<endl;
         imgUtil::cropImages(m_img, imgCrop, rescaleBBox);
-
+        cout<<"[TRACK_HUMAN]End cropImages"<<endl;
         // Get Keypoints and Descriptors
         cv::Mat imgGray;
         vector<cv::KeyPoint> kpt;
         cv::cvtColor(imgCrop, imgGray, cv::COLOR_BGR2GRAY);
+        // cv::cvtColor(m_img, imgGray, cv::COLOR_BGR2GRAY);
         _calcKeypoint(imgGray, kpt);
         ptrObj->updateKeypoint(kpt);
 

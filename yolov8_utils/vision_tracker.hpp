@@ -143,17 +143,17 @@ class VisionTracker
   cv::Mat m_dsp_img;
   cv::Mat m_dsp_imgResize;
   bool m_dsp_results = true;
-  bool m_dsp_objectDetection = false;
-  bool m_dsp_objectTracking = false;
-  bool m_dsp_warningZone = false;
-  bool m_dsp_information = false;
+  bool m_dsp_objectDetection = true;
+  bool m_dsp_objectTracking = true;
+  bool m_dsp_warningZone = true;
+  bool m_dsp_information = true;
   int m_dsp_maxFrameIdx;
 
   // === Debug === //
-  bool m_dbg_tracking = false;
-  bool m_dbg_yolov8 = false;
-  bool m_dbg_objectDetection = false;
-  bool m_dbg_objectTracking = false;
+  bool m_dbg_tracking = true;
+  bool m_dbg_yolov8 = true;
+  bool m_dbg_objectDetection = true;
+  bool m_dbg_objectTracking = true;
   bool m_dbg_saveLogs = false;
   bool m_dbg_saveImages = true;
   bool m_dbg_saveRawImages = false;

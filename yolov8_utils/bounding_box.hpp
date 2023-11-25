@@ -29,7 +29,8 @@ using namespace std;
 class BoundingBox
 {
  public:
-  BoundingBox(float x1, float y1, float x2, float y2, int label);
+  // BoundingBox(float x1, float y1, float x2, float y2, int label);
+   BoundingBox(int x1, int y1, int x2, int y2, int label);
   ~BoundingBox();
 
   ///////////////////////////
@@ -45,10 +46,14 @@ class BoundingBox
   void setFrameStamp(int _frameStamp);
 
   // === Default value === //
-  float x1 = -1;                      // Bounding Box x1
-  float y1 = -1;                      // Bounding Box y1
-  float x2 = -1;                      // Bounding Box x2
-  float y2 = -1;                      // Bounding Box y2
+  int x1 = -1;                      // Bounding Box x1
+  int y1 = -1;                      // Bounding Box y1
+  int x2 = -1;                      // Bounding Box x2
+  int y2 = -1;                      // Bounding Box y2
+  // float x1 = -1;                      // Bounding Box x1
+  // float y1 = -1;                      // Bounding Box y1
+  // float x2 = -1;                      // Bounding Box x2
+  // float y2 = -1;                      // Bounding Box y2
   int label = -1;                   // Bounding Box label
   int frameStamp = 0;               // Some kind of timestamp
   int objID = -1;
