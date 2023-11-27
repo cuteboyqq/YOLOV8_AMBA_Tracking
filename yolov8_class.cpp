@@ -732,9 +732,9 @@ int YoloV8_Class::Get_Yolov8_Bounding_Boxes(std::vector<BoundingBox> &bboxList,c
 
 			cout<<"[Get_Yolov8_Bounding_Boxes]img.rows = "<<img.rows<<endl;
 			cout<<"[Get_Yolov8_Bounding_Boxes]img.cols = "<<img.cols<<endl;
-			int x1 = int(yolov8_result->bbox[i].x_start * 1040);
+			int x1 = int(yolov8_result->bbox[i].x_start * 640);
 			int y1 = int(yolov8_result->bbox[i].y_start * 640);
-			int x2 = int(yolov8_result->bbox[i].x_end * 1040);
+			int x2 = int(yolov8_result->bbox[i].x_end * 640);
 			int y2 = int(yolov8_result->bbox[i].y_end * 640);
 			// int x1 = int(yolov8_result->bbox[i].x_start * img.cols);
 			// int y1 = int(yolov8_result->bbox[i].y_start * img.rows);

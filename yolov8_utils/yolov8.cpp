@@ -714,7 +714,7 @@ bool YOLOv8::getVehicleBoundingBox(
   float wRatio = (float)m_inputWidth / (float)videoWidth;
   float hRatio = (float)m_inputHeight / (float)videoHeight;
 
-  for(int i=0; i<m_numBox; i++)
+  for(int i=0; i<m_yoloOut.size(); i++)
   {
     v8xyxy box = m_yoloOut[i];
     if ((box.c == VEHICLE) && (box.c_prob >= confidence))
@@ -1002,8 +1002,8 @@ bool YOLOv8::getHumanBoundingBox(
   for(int i=0; i<m_yoloOut.size(); i++)
   {
     v8xyxy box = m_yoloOut[i];
-    // if ((box.c == HUMAN) && (box.c_prob >= confidence))
-    // {
+    if ((box.c == HUMAN) && (box.c_prob >= confidence))
+    {
       // m_logger->debug("Get human box [{}] : ({}, {}, {}, {}, {}, {})", \
       //   i, box.x1, box.y1, box.x2, box.y2, box.c, box.c_prob);
       cout<<"box.x1:"<<box.x1<<endl;
@@ -1028,7 +1028,7 @@ bool YOLOv8::getHumanBoundingBox(
       cout<<"box.c_prob:"<<box.c_prob<<endl;
       _outBboxList.push_back(bbox);
       cout<<"_outBboxList.size()="<<_outBboxList.size()<<endl;
-    // }
+    }
   }
   return true;
 }

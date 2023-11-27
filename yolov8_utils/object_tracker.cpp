@@ -15,8 +15,7 @@
 
 
 ObjectTracker::ObjectTracker(Config_S *_config, string _task)
-{ printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start ~~~~~~~~~~~~~ \n");
-  //printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start Task name \n");
+{ 
   // Task name
   if (_task == "human")
   {
@@ -38,7 +37,6 @@ ObjectTracker::ObjectTracker(Config_S *_config, string _task)
     m_task = TRACK_MOTORBIKE;
     m_loggerStr = "MotorbikeTracker";
   }
-  //printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End Task name \n");
   // Logger
 #if defined (SPDLOG)
   auto m_logger = spdlog::stdout_color_mt(m_loggerStr);
@@ -60,7 +58,6 @@ ObjectTracker::ObjectTracker(Config_S *_config, string _task)
   else
     m_logger->set_level(spdlog::level::info);
 #endif
-  //printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start set parameters \n");
   // Image Size
   m_videoWidth = _config->frameWidth;
   m_videoHeight = _config->frameHeight;
@@ -89,11 +86,7 @@ ObjectTracker::ObjectTracker(Config_S *_config, string _task)
 
   // Trajectory
   m_trajectory = new Trajectory(_config);
-  //printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End set parameters \n");
-  //printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] Start _init(_config) \n");
   _init(_config);
-  //printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End _init(_config) \n");
-  printf("[ObjectTracker::ObjectTracker(Config_S *_config, string _task)] End ~~~~~~~~~~~~~ \n");
 };
 
 
@@ -115,7 +108,6 @@ bool ObjectTracker::_init(Config_S *_config)
 // #if defined (SPDLOG)
 //   auto m_logger = spdlog::get(m_loggerStr);
 // #endif
-   printf("[bool ObjectTracker::_init(Config_S *_config)] Start Object Detection \n");
   // Object Detection
   if (m_task == TRACK_HUMAN)
   {
@@ -137,9 +129,23 @@ bool ObjectTracker::_init(Config_S *_config)
     m_tWidth = 20;                   // BoundingBox's width must > tWidth
     m_tHeight = 20;                  // BoundingBox's height must > tHeight
   }
-//printf("[bool ObjectTracker::_init(Config_S *_config)] End Object Detection \n");
-//printf("[bool ObjectTracker::_init(Config_S *_config)] Start Matching threshold \n");
-  // Matching threshold
+
+    if (m_task != TRACK_CAR)
+    {
+      m_tMatchSingle = 0.3;
+      m_tMatchMultiple = 0.3;
+    }
+  if (_config->stTrackerConifg.matchingLevel == "Low")      // Level: Low
+  {
+    // rAppearance settings
+    m_tMatchMinRequriement = 0.45;
+
+    // Matching score
+    m_tMatchSingle = 0.5;
+    m_tMatchMultiple = 0.5;
+  }
+  else if (_config->stTrackerConifg.matchingLevel == "Normal")   // Level: Normal (Default)
+  {
     // rAppearance settings
     m_tMatchMinRequriement = 0.5;
 
@@ -152,51 +158,24 @@ bool ObjectTracker::_init(Config_S *_config)
       m_tMatchSingle = 0.3;
       m_tMatchMultiple = 0.3;
     }
-  // if (_config->stTrackerConifg.matchingLevel == "Low")      // Level: Low
-  // {
-  //   // rAppearance settings
-  //   m_tMatchMinRequriement = 0.45;
+  
+  }
+  else if (_config->stTrackerConifg.matchingLevel == "High")   // Level: High
+  {
+    // rAppearance settings
+    m_tMatchMinRequriement = 0.525;
 
-  //   // Matching score
-  //   m_tMatchSingle = 0.5;
-  //   m_tMatchMultiple = 0.5;
-  //   printf("[bool ObjectTracker::_init(Config_S *_config)] End if (_config->stTrackerConifg.matchingLevel == Low)\n");
-  // }
-  // else if (_config->stTrackerConifg.matchingLevel == "Normal")   // Level: Normal (Default)
-  // {
-  //   // rAppearance settings
-  //   m_tMatchMinRequriement = 0.5;
+    // Matching score
+    m_tMatchSingle = 0.5;
+    m_tMatchMultiple = 0.5;
+  }
+  else
+  {
+#if defined (SPDLOG)
+    m_logger->debug("[Tracker] Matching score uses defualt confiuration ...");
+#endif
+  }
 
-  //   // Matching score
-  //   m_tMatchSingle = 0.8;
-  //   m_tMatchMultiple = 0.8;
-
-  //   if (m_task != TRACK_CAR)
-  //   {
-  //     m_tMatchSingle = 0.3;
-  //     m_tMatchMultiple = 0.3;
-  //   }
-  //   printf("[bool ObjectTracker::_init(Config_S *_config)] End if (_config->stTrackerConifg.matchingLevel == Normal)\n");
-  // }
-  // else if (_config->stTrackerConifg.matchingLevel == "High")   // Level: High
-  // {
-  //   // rAppearance settings
-  //   m_tMatchMinRequriement = 0.525;
-
-  //   // Matching score
-  //   m_tMatchSingle = 0.5;
-  //   m_tMatchMultiple = 0.5;
-  //   printf("[bool ObjectTracker::_init(Config_S *_config)] End if (_config->stTrackerConifg.matchingLevel == High)\n");
-  // }
-//   else
-//   {
-// #if defined (SPDLOG)
-//     m_logger->debug("[Tracker] Matching score uses defualt confiuration ...");
-// #endif
-//   }
-//printf("[bool ObjectTracker::_init(Config_S *_config)] End Matching threshold \n");
-
- 
 
   // Alive counter threshold
   m_tAliveCounter = 10;
@@ -205,11 +184,9 @@ bool ObjectTracker::_init(Config_S *_config)
   {
      m_tAliveCounter *= 0.3;
   }
-   //printf("[bool ObjectTracker::_init(Config_S *_config)] Start  _initObjectList()\n");
-//printf("2023-11-24~~~~~~~~~~\n");
+
   _initObjectList();
-  printf("[bool ObjectTracker::_init(Config_S *_config)]] End Object Detection \n");
-  //printf("[bool ObjectTracker::_init(Config_S *_config)] End  _initObjectList()\n");
+
   return true;
 }
 
@@ -280,33 +257,20 @@ void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)
     m_logger->info("-----------------------------------------");
   }
 #endif
-cout<<"bboxList.size()="<<bboxList.size()<<endl;
-  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] Start  _setCurrBoundingBox(bboxList); \n");
+
   _setCurrBoundingBox(bboxList);
-  cout<<"bboxList.size()="<<bboxList.size()<<endl;
-  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _setCurrBoundingBox(bboxList); \n");
-  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] Start  _updateFrameStamp(); \n");
+ 
   _updateFrameStamp();
-  cout<<"bboxList.size()="<<bboxList.size()<<endl;
-  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _updateFrameStamp(); \n");
+  
   _setCurrFrame(img);
-  cout<<"bboxList.size()="<<bboxList.size()<<endl;
-  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _setCurrFrame(); \n");
-  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] Start  _updateCurrObjectList(); \n");
+  
   _updateCurrObjectList();
-  cout<<"bboxList.size()="<<bboxList.size()<<endl;
-  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _updateCurrObjectList(); \n");
-
-
-  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] Start  _updateTrackingObject(); \n");
+  
   _updateTrackingObject();
-  cout<<"bboxList.size()="<<bboxList.size()<<endl;
-  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _updateTrackingObject(); \n");
-
-  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] Start  _filterOverlapObject(); \n");
+  
   _filterOverlapObject();
-  cout<<"bboxList.size()="<<bboxList.size()<<endl;
-  printf("[void ObjectTracker::run(cv::Mat &img, vector<BoundingBox> &bboxList)] End  _filterOverlapObject(); \n");
+  
+ 
 
 
   
@@ -328,9 +292,7 @@ void ObjectTracker::_updateTrackingObject()
   // Max Tracking
   int numCurrObj = 0;
   int numPrevObj = 0;
-  cout<<"   [_updateTrackingObject] m_maxTracking = "<<m_maxTracking<<endl;
-  cout<<"   [_updateTrackingObject] m_currObjList.size() = "<<m_currObjList.size()<<endl;
-  cout<<"   [_updateTrackingObject] m_prevObjList.size() = "<<m_prevObjList.size()<<endl;
+ 
   for (int i=0; i < m_maxTracking; i++)
   {
     // Get number of enabled current object
@@ -381,23 +343,23 @@ void ObjectTracker::_updateTrackingObject()
   }
 
   // Update Tracked Object's Location
-  if (m_task == TRACK_HUMAN)
-  {
-    // cout << "-------------------------------" << endl;
-    // cout << m_loggerStr << endl;
-    // m_trajectory->bboxToTrajectory(m_prevObjList);
+  // if (m_task == TRACK_HUMAN)
+  // {
+  //   cout << "-------------------------------" << endl;
+  //   cout << m_loggerStr << endl;
+  //   m_trajectory->bboxToTrajectory(m_prevObjList);
 
-    // for (int i=0; i<m_prevObjList.size(); i++)
-    // {
-    //   Object& obj = m_prevObjList[i];
-    //   if (obj.status == 0)
-    //     continue;
+  //   for (int i=0; i<m_prevObjList.size(); i++)
+  //   {
+  //     Object& obj = m_prevObjList[i];
+  //     if (obj.status == 0)
+  //       continue;
 
-    //   m_trajectory->updateLocation3D(obj);
+  //     m_trajectory->updateLocation3D(obj);
 
-    //   // cout << "Obj[" << obj.id << "] Loc = (" << obj.pLocation3D.x << " m, " << obj.pLocation3D.y << " m, " << obj.pLocation3D.z << " m)" << endl;
-    // }
-  }
+  //     // cout << "Obj[" << obj.id << "] Loc = (" << obj.pLocation3D.x << " m, " << obj.pLocation3D.y << " m, " << obj.pLocation3D.z << " m)" << endl;
+  //   }
+  // }
 }
 
 
@@ -462,15 +424,13 @@ int ObjectTracker::_updateCurrObjectList() //TODO: refactor?
   auto time_1 = std::chrono::high_resolution_clock::now();
 
   int ret = 1;
-  cout<<"[ObjectTracker::_updateCurrObjectList()] Start Initialize"<<endl;
   // Initialize
   for (int i=0; i<m_maxObject; i++)
   {
     m_currObjList[i].init(m_frameStamp);
   }
-  cout<<"[ObjectTracker::_updateCurrObjectList()] End Initialize"<<endl;
+ 
   int objIdx = 0;
-  cout<<"m_bboxList.size():"<<m_bboxList.size()<<endl;
   for (int i=0; i<(int)m_bboxList.size(); i++)
   {
     BoundingBox bbox = m_bboxList[i];
@@ -492,14 +452,12 @@ int ObjectTracker::_updateCurrObjectList() //TODO: refactor?
 
         // Appearance Features
         BoundingBox rescaleBBox(-1, -1, -1, -1, m_bboxList[i].label);
-        cout<<"[int ObjectTracker::_updateCurrObjectList()] Start utils::rescaleBBox"<<endl;
+       
         utils::rescaleBBox(
           m_bboxList[i], rescaleBBox, m_modelWidth, m_modelHeight, m_videoWidth, m_videoHeight);
-        cout<<"[int ObjectTracker::_updateCurrObjectList()] End utils::rescaleBBox"<<endl;
         cv::Mat imgCrop;
-        cout<<"[int ObjectTracker::_updateCurrObjectList()] Start imgUtil::cropImages(m_img, imgCrop, rescaleBBox)"<<endl;
         imgUtil::cropImages(m_img, imgCrop, rescaleBBox);
-        cout<<"[int ObjectTracker::_updateCurrObjectList()] End imgUtil::cropImages(m_img, imgCrop, rescaleBBox)"<<endl;
+      
         // Get Keypoints and Descriptors
         cv::Mat imgGray;
         vector<cv::KeyPoint> kpt;
@@ -535,7 +493,7 @@ int ObjectTracker::_updateCurrObjectList() //TODO: refactor?
       }
     }
     else if (m_task == TRACK_HUMAN)
-    { 
+    {
       if (_isValidHumanBBox(bbox))
       {
         Point pCenter = bbox.getCenterPoint();
@@ -547,38 +505,25 @@ int ObjectTracker::_updateCurrObjectList() //TODO: refactor?
         objIdx += 1;
 
         // Appearance Features
-        cout<<"[TRACK_HUMAN]Start rescaleBBox"<<endl;
         BoundingBox rescaleBBox(-1, -1, -1, -1, m_bboxList[i].label);
-        cout<<"m_modelWidth="<<m_modelWidth<<endl;
-        cout<<"m_modelHeight="<<m_modelHeight<<endl;
-
-        cout<<"m_videoWidth="<<m_videoWidth<<endl;
-        cout<<"m_videoHeight="<<m_videoHeight<<endl;
         utils::rescaleBBox(
           m_bboxList[i], rescaleBBox, m_modelWidth, m_modelHeight, m_videoWidth, m_videoHeight);
-        cout<<"[TRACK_HUMAN]End rescaleBBox"<<endl;
-        cout<<"------------------------------------------------------------"<<endl;
-        // 2023-11-25 here will cause Error 
-        // what():  OpenCV(4.2.0) ../modules/core/src/matrix.cpp:465: error: (-215:Assertion failed) 
-        // 0 <= roi.x && 0 <= roi.width && roi.x + roi.width <= m.cols && 0 <= roi.y &&
-        // 0 <= roi.height && roi.y + roi.height <= m.rows in function 'Mat'
+
         cv::Mat imgCrop;
-        cout<<"[TRACK_HUMAN]Start cropImages"<<endl;
         imgUtil::cropImages(m_img, imgCrop, rescaleBBox);
-        cout<<"[TRACK_HUMAN]End cropImages"<<endl;
+
         // Get Keypoints and Descriptors
         cv::Mat imgGray;
         vector<cv::KeyPoint> kpt;
         cv::cvtColor(imgCrop, imgGray, cv::COLOR_BGR2GRAY);
-        //cv::cvtColor(m_img, imgGray, cv::COLOR_BGR2GRAY);
         _calcKeypoint(imgGray, kpt);
         ptrObj->updateKeypoint(kpt);
 
         // // Trajectory
-        vector<Point> tmpTrajectoryList;
-        Point pLocation = m_trajectory->bboxToPointSimple(bbox);
-        ptrObj->updatePointLocation(pLocation);
-        ptrObj->updateTrajectoryList(tmpTrajectoryList);
+        // vector<Point> tmpTrajectoryList;
+        // Point pLocation = m_trajectory->bboxToPointSimple(bbox);
+        // ptrObj->updatePointLocation(pLocation);
+        // ptrObj->updateTrajectoryList(tmpTrajectoryList);
       }
     }
     else
@@ -1979,7 +1924,7 @@ void ObjectTracker::_disableOverlapObject(vector<Object> &currObjectList)
 
 bool ObjectTracker::_isValidHumanBBox(BoundingBox &box)
 {
-
+  cout<<"[ObjectTracker::_isValidHumanBBox(BoundingBox &box)] Start"<<endl;
   if (box.label != DETECT_HUMAN)
     return false;
 
@@ -2007,6 +1952,7 @@ bool ObjectTracker::_isValidHumanBBox(BoundingBox &box)
   //   m_logger->debug("Ivalid human (aspect ratio < 1.0)");
   //   isValid = false;
   // }
+  cout<<"[ObjectTracker::_isValidHumanBBox(BoundingBox &box)] end isValid = "<<isValid<<endl;
   return isValid;
 }
 

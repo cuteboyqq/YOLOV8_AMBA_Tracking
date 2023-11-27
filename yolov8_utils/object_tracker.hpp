@@ -116,7 +116,7 @@ class ObjectTracker
   int m_modelHeight = 0;
   int m_videoWidth = 0;           // video width
   int m_videoHeight = 0;          // video height
-  int m_maxObject = 0;            // max object can show on BEV map
+  int m_maxObject = 100;            // max object can show on BEV map
   int m_maxTracking = 0;          // max tracking object at same time
   float m_warnDistance = 145.0;   // over this distance then sys needs to warning user
   bool m_isFirstTracking = true;  // set to false after start tracking human

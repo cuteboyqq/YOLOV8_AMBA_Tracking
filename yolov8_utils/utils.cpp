@@ -531,24 +531,13 @@ namespace utils
   {
     float w_ratio = (float)modelWidth / (float)videoWidth;
     float h_ratio = (float)modelHeight / (float)videoHeight;
-    cout<<"w_ratio = "<<w_ratio<<endl;
-    cout<<"h_ratio = "<<h_ratio<<endl;
-    cout<<"bbox.x1 = "<<bbox.x1<<endl;
-    cout<<"bbox.y1 = "<<bbox.y1<<endl;
-    cout<<"bbox.x2 = "<<bbox.x2<<endl;
-    cout<<"bbox.y2 = "<<bbox.y2<<endl;
-
+  
     rescaleBBox.x1 = (int)((float)bbox.x1 / w_ratio);
     rescaleBBox.y1 = (int)((float)bbox.y1 / h_ratio);
     rescaleBBox.x2 = (int)((float)bbox.x2 / w_ratio);
     rescaleBBox.y2 = (int)((float)bbox.y2 / h_ratio);
     rescaleBBox.confidence = bbox.confidence;
-    cout<<"---------------------------------------"<<endl;
-    cout<<"rescaleBBox.x1 = "<<rescaleBBox.x1<<endl;
-    cout<<"rescaleBBox.y1 = "<<rescaleBBox.y1<<endl;
-    cout<<"rescaleBBox.x2 = "<<rescaleBBox.x2<<endl;
-    cout<<"rescaleBBox.y2 = "<<rescaleBBox.y2<<endl;
-
+    
     if (rescaleBBox.x1 < 0)
       rescaleBBox.x1 = 0;
     if (rescaleBBox.x2 > videoWidth-1)

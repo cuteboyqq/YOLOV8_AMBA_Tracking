@@ -353,12 +353,11 @@ bool VisionTracker::_initROI()
 }
 
 
-// ============================================
-//                   Main by Alister 2023-11-22
-// ============================================
+// =================================================================
+//                   Main  Alsiter 2023-11-27
+// =================================================================
 bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)
 {
-  printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)]Start~~~~~~~~~~~~\n");
 #if defined (SPDLOG)
   auto m_logger = spdlog::get("VisionTracker");
 #endif
@@ -372,7 +371,7 @@ bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)
 #if defined (SPDLOG)
     m_logger->warn("Input image is empty");
 #endif
-    printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] Input image is empty !\n");
+   
     return false;
   }
 
@@ -380,8 +379,7 @@ bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)
   if (m_dsp_results) m_dsp_img = imgFrame.clone();
 
   // Entry Point
-  //if (m_frameIdx % m_frameStep == 0)
-  if (m_frameIdx % 1 == 0)
+  if (m_frameIdx % m_frameStep == 0)
   {
 #if defined (SPDLOG)
     m_logger->info("");
@@ -390,9 +388,8 @@ bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)
     m_logger->info("========================================");
 #endif
     // Get Image Frame
-    printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] Start Get Image Frame!\n");
     m_img = imgFrame.clone();
-    printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] Done Get Image Frame!\n");
+   
     // AI Inference
 //     if (!_modelInfernece(bboxList))
 //     {
@@ -405,7 +402,6 @@ bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)
 
     // Get Detected Bounding Boxes
     // Alister 2023-11-22
-    printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] Start  if (!_objectDetection(bboxList))\n");
     if (!_objectDetection(bboxList))
     {
 #if defined (SPDLOG)
@@ -413,9 +409,6 @@ bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)
 #endif
       ret = FAILURE;
     }
-    printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] End  if (!_objectDetection(bboxList))\n");
-
-    printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] Start if (!_objectTracking())\n");
     // Object Tracking
     if (!_objectTracking())
     {
@@ -424,11 +417,8 @@ bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)
 #endif
       ret = FAILURE;
     }
-    printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] End if (!_objectTracking())\n");
     // Show Results
-    printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] Start _showDetectionResults\n");
     _showDetectionResults();
-    printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] End _showDetectionResults\n");
 #if defined (SPDLOG)
     // Save Results to Debug Logs
     if (m_dbg_saveLogs)
@@ -436,7 +426,6 @@ bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)
       _saveDetectionResults();
     }
 #endif
-
     //
     m_preparingNextDetection = false;
 
@@ -453,148 +442,24 @@ bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)
   {
     m_preparingNextDetection = true;
   }
-  printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] Start _drawResults\n");
   // Draw and Save Results
-  // if (m_dsp_results && ret == SUCCESS)
-  // {
+  if (m_dsp_results && ret == SUCCESS)
+  {
     _drawResults();
-  // }
-  printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] End _drawResults\n");
-  printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] Start _saveDrawResults\n");
+  }
   if (m_dsp_results && m_dbg_saveImages && ret == SUCCESS)
   {
     _saveDrawResults();
   }
-  printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] End _saveDrawResults\n");
   // Save Raw Images
   if (m_dbg_saveRawImages)
   {
     _saveRawImages();
   }
-  printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] End _saveRawImages\n");
   // Update frame index
-  printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] Start _updateFrameIndex~~~~~~~~~~~~\n");
   _updateFrameIndex();
-  printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)] End _updateFrameIndex~~~~~~~~~~~~\n");
-  printf("[bool VisionTracker::run(cv::Mat &imgFrame,std::vector<BoundingBox> bboxList)]End~~~~~~~~~~~~\n");
   return ret;
 }
-
-
-
-// =================================================================
-//                   Main 
-// =================================================================
-// bool VisionTracker::run_ori(cv::Mat &imgFrame)
-// {
-// #if defined (SPDLOG)
-//   auto m_logger = spdlog::get("VisionTracker");
-// #endif
-//   auto time_0 = std::chrono::high_resolution_clock::now();
-//   auto time_1 = std::chrono::high_resolution_clock::now();
-
-//   bool ret = SUCCESS;
-
-//   if (m_img.empty())
-//   {
-// #if defined (SPDLOG)
-//     m_logger->warn("Input image is empty");
-// #endif
-//     return false;
-//   }
-
-//   // Get Image Frame
-//   if (m_dsp_results) m_dsp_img = imgFrame.clone();
-
-//   // Entry Point
-//   if (m_frameIdx % m_frameStep == 0)
-//   {
-// #if defined (SPDLOG)
-//     m_logger->info("");
-//     m_logger->info("========================================");
-//     m_logger->info("Frame Index: {}", m_frameIdx);
-//     m_logger->info("========================================");
-// #endif
-//     // Get Image Frame
-//     m_img = imgFrame.clone();
-
-//     // AI Inference
-//     if (!_modelInfernece())
-//     {
-// #if defined (SPDLOG)
-//       m_logger->error("AI model inference failed ... STOP VisionTracker");
-// #endif
-//       ret = FAILURE;
-//       exit(1);
-//     }
-
-//     // Get Detected Bounding Boxes
-//     if (!_objectDetection())
-//     {
-// #if defined (SPDLOG)
-//       m_logger->warn("Detect objects failed ...");
-// #endif
-//       ret = FAILURE;
-//     }
-
-//     // Object Tracking
-//     if (!_objectTracking())
-//     {
-// #if defined (SPDLOG)
-//       m_logger->warn("Track objects failed ...");
-// #endif
-//       ret = FAILURE;
-//     }
-
-//     // Show Results
-//     _showDetectionResults();
-
-// #if defined (SPDLOG)
-//     // Save Results to Debug Logs
-//     if (m_dbg_saveLogs)
-//     {
-//       _saveDetectionResults();
-//     }
-// #endif
-
-//     //
-//     m_preparingNextDetection = false;
-
-//     if (m_estimateTime)
-//     {
-//       time_1 = std::chrono::high_resolution_clock::now();
-// #if defined (SPDLOG)
-//       m_logger->info("");
-//       m_logger->info("Processing Time: \t{} ms", std::chrono::duration_cast<std::chrono::nanoseconds>(time_1 - time_0).count() / (1000.0 * 1000));
-// #endif
-//     }
-//   }
-//   else
-//   {
-//     m_preparingNextDetection = true;
-//   }
-
-//   // Draw and Save Results
-//   if (m_dsp_results && ret == SUCCESS)
-//   {
-//     _drawResults();
-//   }
-//   if (m_dsp_results && m_dbg_saveImages && ret == SUCCESS)
-//   {
-//     _saveDrawResults();
-//   }
-
-//   // Save Raw Images
-//   if (m_dbg_saveRawImages)
-//   {
-//     _saveRawImages();
-//   }
-
-//   // Update frame index
-//   _updateFrameIndex();
-
-//   return ret;
-// }
 
 
 // ============================================
@@ -611,62 +476,6 @@ bool VisionTracker::_modelInfernece(std::vector<BoundingBox> bboxList)
   return SUCCESS;
 }
 
-
-// bool VisionTracker::_objectDetection_ori()
-// {
-// #if defined (SPDLOG)
-//   auto m_logger = spdlog::get("VisionTracker");
-// #endif
-
-//   m_yolov8->getHumanBoundingBox(
-//     m_humanBBoxList,
-//     m_config->stOdConfig.humanConfidence,
-//     m_videoWidth,
-//     m_videoHeight,
-//     *m_roi
-//   );
-
-//   m_yolov8->getBikeBoundingBox(
-//     m_bikeBBoxList,
-//     m_config->stOdConfig.bikeConfidence,
-//     m_videoWidth,
-//     m_videoHeight,
-//     *m_roi
-//   );
-
-//   m_yolov8->getVehicleBoundingBox(
-//     m_vehicleBBoxList,
-//     m_config->stOdConfig.carConfidence,
-//     m_videoWidth,
-//     m_videoHeight,
-//     *m_roi
-//   );
-
-//   m_yolov8->getMotorbikeBoundingBox(
-//     m_motorbikeBBoxList,
-//     m_config->stOdConfig.motorbikeConfidence,
-//     m_videoWidth,
-//     m_videoHeight,
-//     *m_roi
-//   );
-
-// #if defined (SPDLOG)
-//   // Debug Logs
-//   m_logger->debug("Num of Human Bounding Box: {}",\
-//     (int)m_humanBBoxList.size());
-
-//   m_logger->debug("Num of Bike Bounding Box: {}",\
-//     (int)m_bikeBBoxList.size());
-
-//   m_logger->debug("Num of Vehicle Bounding Box: {}",\
-//     (int)m_vehicleBBoxList.size());
-
-//   m_logger->debug("Num of Motorbike Bounding Box: {}",\
-//     (int)m_motorbikeBBoxList.size());
-// #endif
-
-//   return SUCCESS;
-// }
 // Alister 2023-11-22
 bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)
 {
@@ -674,7 +483,7 @@ bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)
   auto m_logger = spdlog::get("VisionTracker");
 #endif
   std:vector<v8xyxy> m_yoloOut;
-  printf("[bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)] Start assign bboxList to m_yoloOut\n");
+ 
   for(int i=0;i<bboxList.size();i++)
   {
     v8xyxy box;
@@ -686,11 +495,7 @@ bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)
     box.c_prob = 0.99;
     m_yoloOut.push_back(box);
   }
-  cout<<"[2023-11-24] m_yoloOut.size()="<<m_yoloOut.size()<<endl;
-  printf("[bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)] End assign bboxList to m_yoloOut\n");
-
-
-  printf("[bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)] Start getHumanBoundingBox\n");
+  
   m_yolov8->getHumanBoundingBox(
     m_humanBBoxList,
     m_config->stOdConfig.humanConfidence,
@@ -698,8 +503,7 @@ bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)
     m_videoHeight,
     m_yoloOut
   );
-  cout<<"m_humanBBoxList.size()="<<m_humanBBoxList.size()<<endl;
-  printf("[bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)] End getHumanBoundingBox\n");
+  
   m_yolov8->getBikeBoundingBox(
     m_bikeBBoxList,
     m_config->stOdConfig.bikeConfidence,
@@ -707,8 +511,7 @@ bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)
     m_videoHeight,
     m_yoloOut
   );
-  cout<<"m_bikeBBoxList.size()="<<m_bikeBBoxList.size()<<endl;
-  printf("[bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)] End getBikeBoundingBox\n");
+ 
   m_yolov8->getVehicleBoundingBox(
     m_vehicleBBoxList,
     m_config->stOdConfig.carConfidence,
@@ -716,8 +519,7 @@ bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)
     m_videoHeight,
     m_yoloOut
   );
-  cout<<"m_vehicleBBoxList.size()="<<m_vehicleBBoxList.size()<<endl;
-printf("[bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)] End getVehicleBoundingBox\n");
+  
   m_yolov8->getMotorbikeBoundingBox(
     m_motorbikeBBoxList,
     m_config->stOdConfig.motorbikeConfidence,
@@ -725,8 +527,7 @@ printf("[bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)
     m_videoHeight,
     m_yoloOut
   );
-  cout<<"m_motorbikeBBoxList.size()="<<m_motorbikeBBoxList.size()<<endl;
-printf("[bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)] End getMotorbikeBoundingBox\n");
+ 
 #if defined (SPDLOG)
   // Debug Logs
   m_logger->debug("Num of Human Bounding Box: {}",\
@@ -741,7 +542,7 @@ printf("[bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)
   m_logger->debug("Num of Motorbike Bounding Box: {}",\
     (int)m_motorbikeBBoxList.size());
 #endif
-printf("[bool VisionTracker::_objectDetection(std::vector<BoundingBox> bboxList)] End ~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
   return SUCCESS;
 }
 
@@ -752,39 +553,32 @@ bool VisionTracker::_objectTracking()
 #if defined (SPDLOG)
   auto m_logger = spdlog::get("VisionTracker");
 #endif
-  printf("[bool VisionTracker::_objectTracking()] Start Run Object Tracking\n");
   // Run Object Tracking
-  printf("[bool VisionTracker::_objectTracking()] Start m_humanTracker->run\n");
   m_humanTracker->run(m_img, m_humanBBoxList); //TODO:
-  printf("[bool VisionTracker::_objectTracking()] End m_humanTracker->run\n");
   m_bikeTracker->run(m_img, m_bikeBBoxList); //TODO:
   m_vehicleTracker->run(m_img, m_vehicleBBoxList); //TODO:
   m_motorbikeTracker->run(m_img, m_motorbikeBBoxList); //TODO:
-  printf("[bool VisionTracker::_objectTracking()] End Run Object Tracking\n");
-  printf("[bool VisionTracker::_objectTracking()] Start Get Tracked Objects\n");
+ 
   // Get Tracked Objects
   m_humanTracker->getObjectList(m_humanObjList);
   m_bikeTracker->getObjectList(m_bikeObjList);
   m_vehicleTracker->getObjectList(m_vehicleObjList);
   m_motorbikeTracker->getObjectList(m_motorbikeObjList);
-  printf("[bool VisionTracker::_objectTracking()] End Get Tracked Objects\n");
+ 
   // Get Location of Tracked Objects
-  printf("[bool VisionTracker::_objectTracking()] Start getTrackedObjList\n");
   m_humanTracker->getTrackedObjList(m_humanTrackObjList);
   m_bikeTracker->getTrackedObjList(m_bikeTrackObjList);
   m_vehicleTracker->getTrackedObjList(m_vehicleTrackObjList);
   m_motorbikeTracker->getTrackedObjList(m_motorbikeTrackObjList);
-  printf("[bool VisionTracker::_objectTracking()] End getTrackedObjList\n");
+  
   // Merge Tracked Objects
-  printf("[bool VisionTracker::_objectTracking()] Start insert\n");
   m_trackedObjList.clear();
   m_trackedObjList.insert(m_trackedObjList.end(), m_humanObjList.begin(), m_humanObjList.end());
   m_trackedObjList.insert(m_trackedObjList.end(), m_bikeObjList.begin(), m_bikeObjList.end());
   m_trackedObjList.insert(m_trackedObjList.end(), m_vehicleObjList.begin(), m_vehicleObjList.end());
   m_trackedObjList.insert(m_trackedObjList.end(), m_motorbikeObjList.begin(), m_motorbikeObjList.end());
-   printf("[bool VisionTracker::_objectTracking()] End insert\n");
+   
   // Bounding Box Smoothing
-  printf("[bool VisionTracker::_objectTracking()] Start updateSmoothBoundingBoxList\n");
   for (int i=0; i<m_trackedObjList.size(); i++)
   {
     m_trackedObjList[i].updateSmoothBoundingBoxList();
@@ -914,7 +708,7 @@ void VisionTracker::_saveDrawResults()
 #endif
   string imgName = "frame_" + std::to_string(m_frameIdx) + ".jpg";
   // string imgPath = m_dbg_imgsDirPath + "/" + imgName;
-  string imgPath = "./" + imgName;
+  string imgPath = "./AMBA_result/" + imgName;
   printf("imgPath = %c\n",imgPath);
   cv::imwrite(imgPath, m_dsp_imgResize);
 #if defined (SPDLOG)
@@ -960,43 +754,27 @@ void VisionTracker::_drawBoundingBoxes()
     cv::Scalar(0, 128, 255),   // Orange for humans
     cv::Scalar(255, 255, 0)    // Yellow for motorbikes
   };
-  cout<<" Start for (int j = 0; j < sizeof(boundingBoxLists) / sizeof(boundingBoxLists[0]); j++)"<<endl;
-  cout<<"sizeof(boundingBoxLists) / sizeof(boundingBoxLists[0]) = "<<sizeof(boundingBoxLists) / sizeof(boundingBoxLists[0])<<endl;
+  
   for (int j = 0; j < sizeof(boundingBoxLists) / sizeof(boundingBoxLists[0]); j++)
   {
     std::vector<BoundingBox>& boundingBoxList = boundingBoxLists[j];
     cv::Scalar color = colors[j];
-    cout<<"   [_drawBoundingBoxes]boundingBoxList.size()="<<boundingBoxList.size()<<endl;
+
     for (int i = 0; i < boundingBoxList.size(); i++)
     {
       BoundingBox lastBox = boundingBoxList[i];
-      cout<<"   [_drawBoundingBoxes]x1:"<<boundingBoxList[i].x1<<endl;
-      cout<<"   [_drawBoundingBoxes]y1:"<<boundingBoxList[i].y1<<endl;
-      cout<<"   [_drawBoundingBoxes]x2:"<<boundingBoxList[i].x2<<endl;
-      cout<<"   [_drawBoundingBoxes]y2:"<<boundingBoxList[i].y2<<endl;
-      cout<<"   [_drawBoundingBoxes]boxID:"<<boundingBoxList[i].boxID<<endl;
-      cout<<"   [_drawBoundingBoxes]label:"<<boundingBoxList[i].label<<endl;
-
+  
       BoundingBox rescaleBox(-1, -1, -1, -1, -1);
 
-      // Rescale BBoxes
-      // utils::rescaleBBox(
-      //   lastBox, rescaleBox,
-      //   m_config->modelWidth, m_config->modelHeight,
-      //   m_config->frameWidth, m_config->frameHeight);
+       utils::rescaleBBox(
+        lastBox, rescaleBox,
+        m_config->modelWidth, m_config->modelHeight,
+        3840, 2160);
 
-
-      // cout<<"rescaleBox.x1:"<<rescaleBox.x1<<endl;
-      // cout<<"rescaleBox.y1:"<<rescaleBox.y1<<endl;
-      // cout<<"rescaleBox.x2:"<<rescaleBox.x2<<endl;
-      // cout<<"rescaleBox.y2:"<<rescaleBox.y2<<endl;
       imgUtil::roundedRectangle(
-        m_dsp_imgResize, cv::Point(lastBox.x1, lastBox.y1),
-        cv::Point(lastBox.x2, lastBox.y2),
+        m_dsp_img, cv::Point(rescaleBox.x1, rescaleBox.y1),
+        cv::Point(rescaleBox.x2, rescaleBox.y2),
         color, 2, 0, 10, false);
-      // cv::Point pt1(lastBox.x1, lastBox.y1);
-			// cv::Point pt2(lastBox.x2, lastBox.y2);
-			// cv::rectangle(m_dsp_imgResize, pt1, pt2, cv::Scalar(127,0,255),4,1,0);
     }
   }
 }
@@ -1033,25 +811,19 @@ void VisionTracker::_drawTrackedObjects()
 
     BoundingBox rescaleBox(-1, -1, -1, -1, -1);
 
-    // Rescale BBoxes
-    // utils::rescaleBBox(
-    //   lastBox, rescaleBox,
-    //   m_config->modelWidth, m_config->modelHeight,
-    //   m_config->frameWidth, m_config->frameHeight);
+      // Rescale BBoxes
+    utils::rescaleBBox(
+      lastBox, rescaleBox,
+      m_config->modelWidth, m_config->modelHeight,
+      m_config->frameWidth, m_config->frameHeight);
 
     if (trackedObj.aliveCounter < 3)
     {
       // Draw bounding box in green
-      // imgUtil::roundedRectangle(
-      //   m_dsp_imgResize, cv::Point(rescaleBox.x1, rescaleBox.y1), //m_dsp_imgResize //m_dsp_img
-      //   cv::Point(rescaleBox.x2, rescaleBox.y2),
-      //   cv::Scalar(0, 250, 0), 2, 0, 10, false);
-       imgUtil::roundedRectangle(
-        m_dsp_imgResize, cv::Point(lastBox.x1, lastBox.y1), //m_dsp_imgResize //m_dsp_img
-        cv::Point(lastBox.x2, lastBox.y2),
+      imgUtil::roundedRectangle(
+        m_dsp_img, cv::Point(rescaleBox.x1, rescaleBox.y1),
+        cv::Point(rescaleBox.x2, rescaleBox.y2),
         cv::Scalar(0, 250, 0), 2, 0, 10, false);
-
-
     }
     else
     {
@@ -1067,13 +839,9 @@ void VisionTracker::_drawTrackedObjects()
         color = cv::Scalar(110, 255, 120);
 
       // Draw bounding box with the determined color
-      // imgUtil::roundedRectangle(
-      //   m_dsp_imgResize, cv::Point(rescaleBox.x1, rescaleBox.y1), //m_dsp_img
-      //   cv::Point(rescaleBox.x2, rescaleBox.y2),
-      //   color, 2, 0, 10, false);
-       imgUtil::roundedRectangle(
-        m_dsp_imgResize, cv::Point(lastBox.x1, lastBox.y1), //m_dsp_img
-        cv::Point(lastBox.x2, lastBox.y2),
+      imgUtil::roundedRectangle(
+        m_dsp_img, cv::Point(rescaleBox.x1, rescaleBox.y1),
+        cv::Point(rescaleBox.x2, rescaleBox.y2),
         color, 2, 0, 10, false);
     }
 
@@ -1096,32 +864,21 @@ void VisionTracker::_drawTrackedObjects()
       clsLabel = "M ";
     }
 
-    // cv::rectangle(
-    //   m_dsp_imgResize,
-    //   cv::Point(rescaleBox.x1 + 10, rescaleBox.y1 - 75), //m_dsp_img
-    //   cv::Point(rescaleBox.x1 + 160, rescaleBox.y1 - 3),
-    //   (0, 0, 0),
-    //   -1/*fill*/);
-    cv::rectangle(
-      m_dsp_imgResize,
-      cv::Point(lastBox.x1 + 10, lastBox.y1 - 75), //m_dsp_img
-      cv::Point(lastBox.x1 + 160, lastBox.y1 - 3),
+
+  cv::rectangle(
+      m_dsp_img,
+      cv::Point(rescaleBox.x1 + 10, rescaleBox.y1 - 75),
+      cv::Point(rescaleBox.x1 + 160, rescaleBox.y1 - 3),
       (0, 0, 0),
       -1/*fill*/);
 
 
     Point pCenter = lastBox.getCenterPoint();
-    //m_dsp_img
-    // cv::putText(m_dsp_imgResize, clsLabel + std::to_string(trackedObj.id) + " " + std::to_string(pCenter.x) + ", " + std::to_string(pCenter.y),
-    //   cv::Point(int(rescaleBox.x1) + 20, int(rescaleBox.y1) - 15),
-    //   cv::FONT_HERSHEY_DUPLEX, 2.0,
-    //   cv::Scalar(255, 255, 255), 2, 5, 0);
-    cout<<"Start Tracker putText ID~~~~"<<endl;
-     cv::putText(m_dsp_imgResize, clsLabel + std::to_string(trackedObj.id) + " " + std::to_string(pCenter.x) + ", " + std::to_string(pCenter.y),
-      cv::Point(int(lastBox.x1) + 20, int(lastBox.y1) - 15),
-      cv::FONT_HERSHEY_COMPLEX_SMALL, 2.0,
+
+    cv::putText(m_dsp_img, clsLabel + std::to_string(trackedObj.id) + " " + std::to_string(pCenter.x) + ", " + std::to_string(pCenter.y),
+      cv::Point(int(rescaleBox.x1) + 20, int(rescaleBox.y1) - 15),
+      cv::FONT_HERSHEY_DUPLEX, 2.0,
       cv::Scalar(255, 255, 255), 2, 5, 0);
-    cout<<"End Tracker putText ID~~~~"<<endl;
   }
 }
 
@@ -1166,42 +923,29 @@ void VisionTracker::_drawObjectLocation()
 void VisionTracker::_drawResults()
 {
   int waitKey = 1;
-    printf("[void VisionTracker::_drawResults()] Start resize m_dsp_img\n");
-  cv::resize(m_dsp_img, m_dsp_imgResize, cv::Size(1024, 640), cv::INTER_LINEAR); //1024,640
-  printf("[void VisionTracker::_drawResults()] End resize m_dsp_img\n");
-
-  printf("[void VisionTracker::_drawResults()] Start _drawBoundingBoxes()\n");
-  // if (m_dsp_objectDetection)
-  // {
+  if (m_dsp_objectDetection)
+  {
     _drawBoundingBoxes();
-  // }
-  printf("[void VisionTracker::_drawResults()] End _drawBoundingBoxes()\n");
-
-  printf("[void VisionTracker::_drawResults()] Start _drawTrackedObjects()\n");
+  }
+  
   // if (m_dsp_objectTracking)
   // {
     _drawTrackedObjects();
   //}
-  printf("[void VisionTracker::_drawResults()] End _drawTrackedObjects()\n");
-
-  // printf("[void VisionTracker::_drawResults()] Start resize m_dsp_img\n");
-  // cv::resize(m_dsp_img, m_dsp_imgResize, cv::Size(1024, 640), cv::INTER_LINEAR);
-  // printf("[void VisionTracker::_drawResults()] End resize m_dsp_img\n");
-
-  printf("[void VisionTracker::_drawResults()] Start _drawInformation\n");
+ 
+  cv::resize(m_dsp_img, m_dsp_imgResize, cv::Size(1024, 640), cv::INTER_LINEAR);
+ 
   if (m_dsp_information)
   {
     _drawInformation();
   }
-  printf("[void VisionTracker::_drawResults()] End _drawInformation\n");
+ 
   // if (m_dsp_location)
-
-  printf("[void VisionTracker::_drawResults()] Start _drawObjectLocation\n");
   if (1)
   {
     _drawObjectLocation();
   }
-  printf("[void VisionTracker::_drawResults()] End _drawObjectLocation\n");
+
   if (m_frameIdx < m_dsp_maxFrameIdx)
   {
     waitKey = 1;
