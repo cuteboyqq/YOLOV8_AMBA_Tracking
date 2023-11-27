@@ -263,7 +263,7 @@ class ObjectTracker
   float m_tMatchMinRequriement = 0.5;   // Valid matching score (non-matched object)
   float m_tMatchSingle = 1.0;
   float m_tMatchMultiple = 0.8;
-  int m_tAliveCounter = 5;             // Start tracking object when is alives over X frames
+  int m_tAliveCounter = 1;             // Start tracking object when is alives over X frames
 
   // === Debug === //
   string m_loggerStr;

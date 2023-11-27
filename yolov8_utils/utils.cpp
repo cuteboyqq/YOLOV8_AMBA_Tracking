@@ -533,6 +533,11 @@ namespace utils
     float h_ratio = (float)modelHeight / (float)videoHeight;
     cout<<"w_ratio = "<<w_ratio<<endl;
     cout<<"h_ratio = "<<h_ratio<<endl;
+    cout<<"bbox.x1 = "<<bbox.x1<<endl;
+    cout<<"bbox.y1 = "<<bbox.y1<<endl;
+    cout<<"bbox.x2 = "<<bbox.x2<<endl;
+    cout<<"bbox.y2 = "<<bbox.y2<<endl;
+
     rescaleBBox.x1 = (int)((float)bbox.x1 / w_ratio);
     rescaleBBox.y1 = (int)((float)bbox.y1 / h_ratio);
     rescaleBBox.x2 = (int)((float)bbox.x2 / w_ratio);

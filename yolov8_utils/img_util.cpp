@@ -623,8 +623,8 @@ namespace imgUtil
     else if (box.y2 > img.rows)
         box.y2 = img.rows;
 
-    w = box.x2 - box.x1;
-    h = box.y2 - box.y1;
+    w = abs(box.x2 - box.x1);
+    h = abs(box.y2 - box.y1);
     cout<<"[cropImages]box.x1 = "<<box.x1<<endl;
     cout<<"[cropImages]box.y1 = "<<box.y1<<endl;
     cout<<"[cropImages]w = "<<w<<endl;

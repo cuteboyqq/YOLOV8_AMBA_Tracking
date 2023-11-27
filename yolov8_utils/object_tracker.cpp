@@ -535,7 +535,7 @@ int ObjectTracker::_updateCurrObjectList() //TODO: refactor?
       }
     }
     else if (m_task == TRACK_HUMAN)
-    {
+    { 
       if (_isValidHumanBBox(bbox))
       {
         Point pCenter = bbox.getCenterPoint();
@@ -558,23 +558,27 @@ int ObjectTracker::_updateCurrObjectList() //TODO: refactor?
           m_bboxList[i], rescaleBBox, m_modelWidth, m_modelHeight, m_videoWidth, m_videoHeight);
         cout<<"[TRACK_HUMAN]End rescaleBBox"<<endl;
         cout<<"------------------------------------------------------------"<<endl;
-        // cv::Mat imgCrop;
-        // cout<<"[TRACK_HUMAN]Start cropImages"<<endl;
-        // imgUtil::cropImages(m_img, imgCrop, rescaleBBox);
-        // cout<<"[TRACK_HUMAN]End cropImages"<<endl;
+        // 2023-11-25 here will cause Error 
+        // what():  OpenCV(4.2.0) ../modules/core/src/matrix.cpp:465: error: (-215:Assertion failed) 
+        // 0 <= roi.x && 0 <= roi.width && roi.x + roi.width <= m.cols && 0 <= roi.y &&
+        // 0 <= roi.height && roi.y + roi.height <= m.rows in function 'Mat'
+        cv::Mat imgCrop;
+        cout<<"[TRACK_HUMAN]Start cropImages"<<endl;
+        imgUtil::cropImages(m_img, imgCrop, rescaleBBox);
+        cout<<"[TRACK_HUMAN]End cropImages"<<endl;
         // Get Keypoints and Descriptors
-        // cv::Mat imgGray;
-        // vector<cv::KeyPoint> kpt;
-        // cv::cvtColor(imgCrop, imgGray, cv::COLOR_BGR2GRAY);
-        // // cv::cvtColor(m_img, imgGray, cv::COLOR_BGR2GRAY);
-        // _calcKeypoint(imgGray, kpt);
-        // ptrObj->updateKeypoint(kpt);
+        cv::Mat imgGray;
+        vector<cv::KeyPoint> kpt;
+        cv::cvtColor(imgCrop, imgGray, cv::COLOR_BGR2GRAY);
+        //cv::cvtColor(m_img, imgGray, cv::COLOR_BGR2GRAY);
+        _calcKeypoint(imgGray, kpt);
+        ptrObj->updateKeypoint(kpt);
 
         // // Trajectory
-        // vector<Point> tmpTrajectoryList;
-        // Point pLocation = m_trajectory->bboxToPointSimple(bbox);
-        // ptrObj->updatePointLocation(pLocation);
-        // ptrObj->updateTrajectoryList(tmpTrajectoryList);
+        vector<Point> tmpTrajectoryList;
+        Point pLocation = m_trajectory->bboxToPointSimple(bbox);
+        ptrObj->updatePointLocation(pLocation);
+        ptrObj->updateTrajectoryList(tmpTrajectoryList);
       }
     }
     else
