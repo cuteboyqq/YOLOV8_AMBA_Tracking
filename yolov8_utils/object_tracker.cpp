@@ -1924,7 +1924,6 @@ void ObjectTracker::_disableOverlapObject(vector<Object> &currObjectList)
 
 bool ObjectTracker::_isValidHumanBBox(BoundingBox &box)
 {
-  cout<<"[ObjectTracker::_isValidHumanBBox(BoundingBox &box)] Start"<<endl;
   if (box.label != DETECT_HUMAN)
     return false;
 
@@ -1952,7 +1951,6 @@ bool ObjectTracker::_isValidHumanBBox(BoundingBox &box)
   //   m_logger->debug("Ivalid human (aspect ratio < 1.0)");
   //   isValid = false;
   // }
-  cout<<"[ObjectTracker::_isValidHumanBBox(BoundingBox &box)] end isValid = "<<isValid<<endl;
   return isValid;
 }
 

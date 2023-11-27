@@ -187,8 +187,8 @@ class YOLOv8
 
   // Input
   int m_inputChannel = 0;
-  int m_inputHeight = 0;
-  int m_inputWidth = 0;
+  int m_inputHeight = 640;
+  int m_inputWidth = 640;
   int m_detectionSize = 0;
   int m_detectionBoxSize = 0;
   int m_detectionConfSize = 0;

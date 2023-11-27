@@ -19,7 +19,7 @@ void showTrackedHumanResults(std::vector<TrackedObj>& objList)
   {
     TrackedObj& obj = objList[i];
 
-	  cout << "Obj[" << obj.id << "] ";
+	cout << "Obj[" << obj.id << "] ";
     cout << "Type: " << obj.type << " ";
     cout << "Conf: " << obj.confidence << " ";
     cout << "Loc: (" << obj.pLoc.x << " m, " << obj.pLoc.y << " m, " << obj.pLoc.z << " m)" << endl;

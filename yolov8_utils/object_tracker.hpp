@@ -66,8 +66,8 @@ using namespace std;
 enum trackingTask
 {
   TRACK_HUMAN = 0,
-  TRACK_CAR = 1,
-  TRACK_BIKE = 2,
+  TRACK_CAR = 2,
+  TRACK_BIKE = 1,
   TRACK_MOTORBIKE = 3
 };
 

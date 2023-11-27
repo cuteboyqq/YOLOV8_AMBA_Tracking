@@ -713,7 +713,7 @@ bool YOLOv8::getVehicleBoundingBox(
 
   float wRatio = (float)m_inputWidth / (float)videoWidth;
   float hRatio = (float)m_inputHeight / (float)videoHeight;
-
+ 
   for(int i=0; i<m_yoloOut.size(); i++)
   {
     v8xyxy box = m_yoloOut[i];
@@ -721,9 +721,8 @@ bool YOLOv8::getVehicleBoundingBox(
     {
       // m_logger->debug("Get vehicle box [{}] : ({}, {}, {}, {}, {}, {})", \
       //   i, box.x1, box.y1, box.x2, box.y2, box.c, box.c_prob);
-
       BoundingBox bbox(box.x1, box.y1, box.x2, box.y2, box.c);
-
+      
       float bboxWidth = (float)bbox.getWidth()/wRatio;
       float bboxHeight = (float)bbox.getHeight()/hRatio;
 
@@ -738,12 +737,14 @@ bool YOLOv8::getVehicleBoundingBox(
       {
         // m_logger->debug("filter out outliers - (2)");
         // m_logger->debug("bboxWidth < 15 || bboxHeight < 10");
+        cout<<"bboxWidth < 15 || bboxHeight < 10"<<endl;
         continue;
       }
       else if (bbox.getAspectRatio() < 0.4)
       {
         // m_logger->debug("filter out outliers - (3)");
         // m_logger->debug("bboxA.getAspectRatio() < 0.4");
+        cout<<"bbox.getAspectRatio() < 0.4"<<endl;
         continue;
       }
 
@@ -799,7 +800,7 @@ bool YOLOv8::getMotorbikeBoundingBox(
   //
   vector<BoundingBox> tmpBboxList;
 
-  for(int i=0; i<m_numBox; i++)
+  for(int i=0; i<m_yoloOut.size(); i++)
   {
     v8xyxy box = m_yoloOut[i];
     if ((box.c == MOTORBIKE) && (box.c_prob >= confidence))  // Rider class
@@ -900,7 +901,7 @@ bool YOLOv8::getBikeBoundingBox(
   //
   vector<BoundingBox> tmpBboxList;
 
-  for(int i=0; i<m_numBox; i++)
+  for(int i=0; i<m_yoloOut.size(); i++)
   {
     v8xyxy box = m_yoloOut[i];
     if ((box.c == MOTORBIKE) && (box.c_prob >= confidence))  // Rider class
@@ -988,15 +989,11 @@ bool YOLOv8::getHumanBoundingBox(
 
   // Clear previous bounding boxes
   _outBboxList.clear();
-  cout<<"[getHumanBoundingBox]m_yoloOut.size()="<<m_yoloOut.size()<<endl;
   // m_logger->debug("Get human box => m_numBox = {}", m_numBox);
-
   // Point pROI_TL = fcwROI.getCornerPoint()[0];
   // Point pROI_TR = fcwROI.getCornerPoint()[1];
-
   float wRatio = (float)m_inputWidth / (float)videoWidth;
   float hRatio = (float)m_inputHeight / (float)videoHeight;
-  cout<<"     [getHumanBoundingBox]m_numBox="<<m_numBox<<endl;
   // for(int i=0; i<m_numBox; i++)
   // for(int i=0; i<m_yoloOut.size(); i++)
   for(int i=0; i<m_yoloOut.size(); i++)

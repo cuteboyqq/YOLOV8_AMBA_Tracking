@@ -82,31 +82,27 @@ bool VisionTracker::_init(std::string configPath)
   utils::getDateTime(m_dbg_dateTime);
 
   // Read VisionTracker Configuration
-  printf("[VisionTracker::_init(std::string configPath)] start m_config = new Config_S()\n");
+  
   m_config = new Config_S();
-  printf("[VisionTracker::_init(std::string configPath)] End m_config = new Config_S()\n");
-  printf("[VisionTracker::_init(std::string configPath)] Start m_configReader = new TrackerConfigReader()\n");
+ 
   m_configReader = new TrackerConfigReader();
-  printf("[VisionTracker::_init(std::string configPath)] End m_configReader = new TrackerConfigReader()\n");
-  printf("[VisionTracker::_init(std::string configPath)] Start m_configReader->read(configPath)\n");
+  
   m_configReader->read(configPath);
-  printf("[VisionTracker::_init(std::string configPath)] End m_configReader->read(configPath)\n");
+ 
 #if defined (SPDLOG)
   m_logger->info("Read configuration file ... Done");
 #endif
-  printf("[VisionTracker::_init(std::string configPath)] Start m_config = m_configReader->getConfig()\n");
+  
   m_config = m_configReader->getConfig();
-  printf("[VisionTracker::_init(std::string configPath)] end m_config = m_configReader->getConfig()\n");
+ 
 #if defined (SPDLOG)
   m_logger->info("Set configuration ... Done");
 #endif
-  printf("[VisionTracker::_init(std::string configPath)] Start if (utils::checkFileExists(m_config->modelPath))\n");
+ 
   // Create AI model
   if (utils::checkFileExists(m_config->modelPath))
   { 
-    printf("[VisionTracker::_init(std::string configPath)] Start m_yolov8 = new YOLOv8(m_config)\n");
     m_yolov8 = new YOLOv8(m_config);
-    printf("[VisionTracker::_init(std::string configPath)] End m_yolov8 = new YOLOv8(m_config)\n");
 #if defined (SPDLOG)
     m_logger->info("Init AI model ... Done");
 #endif
@@ -119,13 +115,13 @@ bool VisionTracker::_init(std::string configPath)
 #endif
     exit(0);
   }
-  printf("[VisionTracker::_init(std::string configPath)] End if (utils::checkFileExists(m_config->modelPath))\n");
+ 
   // ROI
   _initROI();
 #if defined (SPDLOG)
   m_logger->info("Init ROI ... Done");
 #endif
-  printf("[VisionTracker::_init(std::string configPath)] Start parameter setting\n");
+ 
   // Video Input Size
   m_videoWidth = m_config->frameWidth;
   m_videoHeight = m_config->frameHeight;
@@ -144,25 +140,18 @@ bool VisionTracker::_init(std::string configPath)
   m_focalRescaleRatio = (float)m_videoHeight / (float)m_modelHeight;
 
   // Object Tracker
-  printf("[VisionTracker::_init(std::string configPath)] Start new ObjectTracker=================\n");
-  printf("[VisionTracker::_init(std::string configPath)] Start new ObjectTracker human\n");
   m_humanTracker = new ObjectTracker(m_config, "human");
-   printf("[VisionTracker::_init(std::string configPath)] End new ObjectTracker human\n");
   m_bikeTracker = new ObjectTracker(m_config, "bike");
-  printf("[VisionTracker::_init(std::string configPath)] End new ObjectTracker bike\n");
   m_vehicleTracker = new ObjectTracker(m_config, "vehicle");
-    printf("[VisionTracker::_init(std::string configPath)] End new ObjectTracker vehicle\n");
   m_motorbikeTracker = new ObjectTracker(m_config, "motorbike");
-    printf("[VisionTracker::_init(std::string configPath)] End new ObjectTracker motorbike\n");
-  printf("[VisionTracker::_init(std::string configPath)] End new ObjectTracker=================\n");
+
+ 
   // TODO:
-  printf("[VisionTracker::_init(std::string configPath)] Start setROI\n");
   m_vehicleTracker->setROI(*m_roi);
   m_bikeTracker->setROI(*m_roi);
   m_humanTracker->setROI(*m_roi);
   m_motorbikeTracker->setROI(*m_roi);
-  printf("[VisionTracker::_init(std::string configPath)] End setROI\n");
-  printf("[VisionTracker::_init(std::string configPath)] End parameter setting\n");
+
 #if defined (SPDLOG)
   m_logger->info("Init Object Trackers ... Done");
 #endif
@@ -174,7 +163,7 @@ bool VisionTracker::_init(std::string configPath)
 #if defined (SPDLOG)
   m_logger->info("Init VisionTracker ... Done");
 #endif
-  printf("[VisionTracker::_init(std::string configPath)] End~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
   return SUCCESS;
 }
 
@@ -746,7 +735,7 @@ void VisionTracker::_drawBoundingBoxes()
     m_vehicleBBoxList,
     m_motorbikeBBoxList
   };
-
+  cout<<"------------------------m_vehicleBBoxList.size() = "<<m_vehicleBBoxList.size()<<endl;
   cv::Scalar colors[] =
   {
     cv::Scalar(0, 255, 0),     // Green for vehicles
@@ -790,11 +779,11 @@ void VisionTracker::_drawTrackedObjects()
     // Skip objects with specific conditions
     if (trackedObj.status == 0 || trackedObj.disappearCounter > 5 || trackedObj.bboxList.empty())
     {
-      cout<<"   Skip objects with specific conditions"<<endl;
-      cout<<"trackedObj.status == 0 || trackedObj.disappearCounter > 5 || trackedObj.bboxList.empty()"<<endl;
-      cout<<" trackedObj.status = "<<trackedObj.status<<endl;
-      cout<<"trackedObj.disappearCounter = "<<trackedObj.disappearCounter<<endl;
-      cout<<"trackedObj.bboxList = "<<trackedObj.bboxList.size()<<endl;
+      // cout<<"   Skip objects with specific conditions"<<endl;
+      // cout<<"trackedObj.status == 0 || trackedObj.disappearCounter > 5 || trackedObj.bboxList.empty()"<<endl;
+      // cout<<" trackedObj.status = "<<trackedObj.status<<endl;
+      // cout<<"trackedObj.disappearCounter = "<<trackedObj.disappearCounter<<endl;
+      // cout<<"trackedObj.bboxList = "<<trackedObj.bboxList.size()<<endl;
       continue;
     }
 
@@ -823,7 +812,7 @@ void VisionTracker::_drawTrackedObjects()
       imgUtil::roundedRectangle(
         m_dsp_img, cv::Point(rescaleBox.x1, rescaleBox.y1),
         cv::Point(rescaleBox.x2, rescaleBox.y2),
-        cv::Scalar(0, 250, 0), 2, 0, 10, false);
+        cv::Scalar(0, 250, 0), 6, 0, 10, false);
     }
     else
     {
@@ -842,7 +831,7 @@ void VisionTracker::_drawTrackedObjects()
       imgUtil::roundedRectangle(
         m_dsp_img, cv::Point(rescaleBox.x1, rescaleBox.y1),
         cv::Point(rescaleBox.x2, rescaleBox.y2),
-        color, 2, 0, 10, false);
+        color, 6, 0, 10, false);
     }
 
     // Draw label and ID for valid distance
@@ -923,15 +912,16 @@ void VisionTracker::_drawObjectLocation()
 void VisionTracker::_drawResults()
 {
   int waitKey = 1;
-  if (m_dsp_objectDetection)
-  {
-    _drawBoundingBoxes();
-  }
-  
-  // if (m_dsp_objectTracking)
+  cout<<"====================m_dsp_objectDetection = "<<m_dsp_objectDetection<<endl;
+  // if (m_dsp_objectDetection)
   // {
+  //   _drawBoundingBoxes();
+  // }
+  
+  if (m_dsp_objectTracking)
+  {
     _drawTrackedObjects();
-  //}
+  }
  
   cv::resize(m_dsp_img, m_dsp_imgResize, cv::Size(1024, 640), cv::INTER_LINEAR);
  

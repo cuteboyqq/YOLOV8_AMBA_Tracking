@@ -143,7 +143,7 @@ class VisionTracker
   cv::Mat m_dsp_img;
   cv::Mat m_dsp_imgResize;
   bool m_dsp_results = true;
-  bool m_dsp_objectDetection = true;
+  bool m_dsp_objectDetection = false;
   bool m_dsp_objectTracking = true;
   bool m_dsp_warningZone = true;
   bool m_dsp_information = true;
