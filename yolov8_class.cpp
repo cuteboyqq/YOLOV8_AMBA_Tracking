@@ -730,12 +730,12 @@ int YoloV8_Class::Get_Yolov8_Bounding_Boxes(std::vector<BoundingBox> &bboxList,c
 			yolov8_result->bbox[i].score,
 			yolov8_result->bbox[i].label);
 
-			cout<<"[Get_Yolov8_Bounding_Boxes]img.rows = "<<img.rows<<endl;
-			cout<<"[Get_Yolov8_Bounding_Boxes]img.cols = "<<img.cols<<endl;
-			int x1 = int(yolov8_result->bbox[i].x_start * 640);
-			int y1 = int(yolov8_result->bbox[i].y_start * 640);
-			int x2 = int(yolov8_result->bbox[i].x_end * 640);
-			int y2 = int(yolov8_result->bbox[i].y_end * 640);
+			// cout<<"[Get_Yolov8_Bounding_Boxes]img.rows = "<<img.rows<<endl;
+			// cout<<"[Get_Yolov8_Bounding_Boxes]img.cols = "<<img.cols<<endl;
+			int x1 = int(yolov8_result->bbox[i].x_start * 416);
+			int y1 = int(yolov8_result->bbox[i].y_start * 416);
+			int x2 = int(yolov8_result->bbox[i].x_end * 416);
+			int y2 = int(yolov8_result->bbox[i].y_end * 416);
 			// int x1 = int(yolov8_result->bbox[i].x_start * img.cols);
 			// int y1 = int(yolov8_result->bbox[i].y_start * img.rows);
 			// int x2 = int(yolov8_result->bbox[i].x_end * img.cols);
@@ -745,8 +745,12 @@ int YoloV8_Class::Get_Yolov8_Bounding_Boxes(std::vector<BoundingBox> &bboxList,c
 			// float x2 = float(yolov8_result->bbox[i].x_end);
 			// float y2 = float(yolov8_result->bbox[i].y_end);
 			// cout<<"[Get_Yolov8_Bounding_Boxes] x1:"<<x1<<" y1:"<<y1<<" x2:"<<x2<<" y2:"<<y2<<endl;
-			bboxList.push_back(BoundingBox( x1,y1,x2,y2,
+			if(x1!=0 && x2!=0 && y1!=0 && y2!=0)
+			{
+				bboxList.push_back(BoundingBox( x1,y1,x2,y2,
 									yolov8_result->bbox[i].id));
+			}
+			
 
 		}
 		printf("[Get_Yolov8_Bounding_Boxes]print BB~~~~~~~~~~~~~~~~~~\n");
