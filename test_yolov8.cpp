@@ -31,25 +31,31 @@ int main(int argc, char **argv)
 {
 	int rval = 0;
 	int sig_flag = 0;
+	int idxFrame = 0;
 	std::vector<BoundingBox> bboxList;
 	YoloV8_Class yolov8(argc,argv);
 	VisionTracker vTracker("./config/config.txt");
 	VisionTrackingResults result;
-	int c = 0;
 	ea_tensor_t *tensor;
 	img_set_t *img_set;
 	img_set = new img_set_t;
 	do
-	{
+	{	idxFrame+=1;
+		cout<<"---------------------------[main]Frame num = "<<idxFrame<<"-------------------------------"<<endl;
 		cv::Mat img;
 		img = yolov8.Get_img();
-		sig_flag = yolov8.test_yolov8_run(); //RVAL_OK
+		sig_flag = yolov8.test_yolov8_run();
 		bboxList.clear();
 		yolov8.Get_Yolov8_Bounding_Boxes(bboxList,img);
-		// if(bboxList.size()>0){
-			vTracker.run(img,bboxList);
-		// }
-		c+=1;
+		vTracker.run(img,bboxList);
+		vTracker.getResults(result);
+		if (vTracker.isFinishDetection())
+		{
+			std::cout << "\nFrame: [" << idxFrame << "]" << std::endl;
+			std::cout << "-------------------------------------------------" << std::endl;
+			showTrackedHumanResults(result.humanObjList);
+		}
+		
 	}while(sig_flag==0);
 
 	return rval;
